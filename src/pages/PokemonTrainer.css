@@ -5,7 +5,8 @@
     padding: 1.5rem;
     width: 100%;
     /* Ajustado para preencher a tela, considerando o cabeçalho (se houver) */
-    height: calc(100vh - 64px); 
+    height: calc(100vh - 64px);
+    background: #e8f0e8;
 }
 
 .main-content {

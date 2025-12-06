@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './PokemonTrainer.css';
+import Header from '../components/Header'
+
 
 const dummyPokemons = [
   
@@ -218,29 +220,32 @@ const PokemonTrainer = () => {
   );
 
   return (
-    <div className="container">
-      <div className="main-content">
-        <div className="tabs">
-          <button 
-            className={`tab ${activeTab === 'register' ? 'active' : ''}`} 
-            onClick={() => setActiveTab('register')}
-          >
-            ➕ Cadastrar Pokémon
-          </button>
-          <button 
-            className={`tab ${activeTab === 'list' ? 'active' : ''}`} 
-            onClick={() => setActiveTab('list')}
-          >
-            📋 Pokémons Cadastrados
-          </button>
-        </div>
+    <>
+      <Header />
+      <div className="container">
+        <div className="main-content">
+          <div className="tabs">
+            <button 
+              className={`tab ${activeTab === 'register' ? 'active' : ''}`} 
+              onClick={() => setActiveTab('register')}
+            >
+              ➕ Cadastrar Pokémon
+            </button>
+            <button 
+              className={`tab ${activeTab === 'list' ? 'active' : ''}`} 
+              onClick={() => setActiveTab('list')}
+            >
+              📋 Pokémons Cadastrados
+            </button>
+          </div>
 
-        <div className="tab-content">
-          {activeTab === 'register' && renderRegisterTab()}
-          {activeTab === 'list' && renderListTab()}
+          <div className="tab-content">
+            {activeTab === 'register' && renderRegisterTab()}
+            {activeTab === 'list' && renderListTab()}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 
