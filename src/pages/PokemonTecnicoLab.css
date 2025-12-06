@@ -1,0 +1,229 @@
+.container {
+  display: flex;
+  gap: 1.5rem;
+  padding: 1.5rem;
+  width: 100%;
+  height: calc(100vh - 64px);
+}
+
+.main-content {
+  flex: 1;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  padding: 1.5rem 2rem;
+  overflow-y: auto;
+}
+
+.pokemon-selector {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-bottom: 1.5rem;
+}
+
+.pokemon-selector label {
+  font-weight: 600;
+  color: #333;
+}
+
+.pokemon-selector select {
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  background: #fff;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.pokemon-selector select:focus {
+  outline: none;
+  border-color: #4a90e2;
+  box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.15);
+}
+
+.tabs {
+  display: flex;
+  gap: 1.25rem;
+  border-bottom: 2px solid #f0f0f0;
+  margin-bottom: 1.5rem;
+}
+
+.tab {
+  background: none;
+  border: none;
+  padding: 0.75rem 0;
+  cursor: pointer;
+  color: #999;
+  font-weight: 500;
+  position: relative;
+  transition: color 0.2s ease;
+}
+
+.tab:hover {
+  color: #666;
+}
+
+.tab.active {
+  color: #4a90e2;
+}
+
+.tab.active::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2px;
+  height: 2px;
+  background: #4a90e2;
+}
+
+.tab-content {
+  padding-top: 1rem;
+  color: #555;
+  font-size: 0.95rem;
+}
+
+.tab-content p {
+  margin: 0;
+}
+
+@media (max-width: 1024px) {
+  .container {
+    flex-direction: column;
+  }
+}
+
+.exam-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.exam-card {
+  background: #fff;
+  border-radius: 10px;
+  padding: 16px;
+  cursor: pointer;
+  border: 1px solid #e0e0e0;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.exam-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+}
+
+.status {
+  display: inline-block;
+  margin-top: 6px;
+  font-size: 12px;
+  padding: 4px 8px;
+  border-radius: 12px;
+  background: #f3f3f3;
+}
+
+.exam-editor-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.exam-editor {
+  background: #fff;
+  width: 400px;
+  border-radius: 12px;
+  padding: 24px;
+}
+
+.editor-group {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 12px;
+}
+
+.editor-group input {
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.editor-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.btn-cancel {
+  background: #eee;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+}
+
+.btn-save {
+  background: #4a90e2;
+  color: white;
+  border: none;
+  padding: 8px 14px;
+  border-radius: 6px;
+}
+
+.section-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 1.5rem 0 1rem;
+  color: #333;
+}
+
+.observacoes {
+  margin-top: 20px;
+  max-width: 700px;
+}
+
+.observacoes .section-title {
+  margin-bottom: 12px;
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+}
+
+.observacoes textarea {
+  width: 100%;
+  min-height: 140px;
+  padding: 12px;
+  font-size: 14px;
+  font-family: inherit;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.observacoes textarea:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+}
+
+.observacoes .btn-save {
+  margin-top: 12px;
+  padding: 10px 16px;
+  background-color: #3b82f6;
+  color: white;
+  font-weight: 500;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.observacoes .btn-save:hover {
+  background-color: #2563eb;
+}

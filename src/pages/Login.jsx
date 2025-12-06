@@ -19,25 +19,48 @@ function Login() {
     setError("");
 
     try {
-      const response = await fetch(`${API_URL}/auth/login`, {
+      const loginResponse = await fetch(`${API_URL}/auth/login`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        credentials: "include", // Important: send and receive cookies
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ email, senha }),
       });
 
-      const data = await response.json();
+      const loginData = await loginResponse.json();
 
-      if (!response.ok) {
-        throw new Error(data.message || "Erro ao fazer login");
+      if (!loginResponse.ok) {
+        throw new Error(loginData.message || "Erro ao fazer login");
       }
 
-      console.log("Login realizado com sucesso:", data.usuario);
+      const usuarioId = loginData.usuario.id;
 
-      // Redireciona para a página de atendimento
-      navigate("/atendimento");
+      const usuarioResponse = await fetch(`${API_URL}/usuarios/${usuarioId}`, {
+        method: "GET",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+      });
+
+      const usuarioData = await usuarioResponse.json();
+
+      if (!usuarioResponse.ok) {
+        throw new Error(usuarioData.message || "Erro ao obter usuário");
+      }
+
+      const perfilId = Number(usuarioData.perfilId || usuarioData.perfil?.id);
+
+      switch (perfilId) {
+        case 1:
+          navigate("/treinador");
+          break;
+        case 2:
+          navigate("/atendimento");
+          break;
+        case 3:
+          navigate("/tecnico");
+          break;
+        default:
+          navigate("/");
+      }
     } catch (err) {
       console.error("Erro no login:", err);
       setError(err.message || "Email ou senha inválidos");
@@ -52,14 +75,17 @@ function Login() {
         <h1 className="login-title">Login</h1>
 
         {error && (
-          <div className="error-message" style={{
-            backgroundColor: '#fee',
-            color: '#c33',
-            padding: '10px',
-            borderRadius: '5px',
-            marginBottom: '15px',
-            textAlign: 'center'
-          }}>
+          <div
+            className="error-message"
+            style={{
+              backgroundColor: "#fee",
+              color: "#c33",
+              padding: "10px",
+              borderRadius: "5px",
+              marginBottom: "15px",
+              textAlign: "center",
+            }}
+          >
             {error}
           </div>
         )}
@@ -79,7 +105,6 @@ function Login() {
 
           <div className="login-group">
             <label>Senha</label>
-
             <div className="senha-wrapper">
               <input
                 type={mostrarSenha ? "text" : "password"}
@@ -89,7 +114,6 @@ function Login() {
                 required
                 disabled={loading}
               />
-
               <button
                 type="button"
                 className="toggle-senha"
@@ -107,7 +131,7 @@ function Login() {
           </button>
 
           <div className="login-footer">
-            <span>Ainda não tem conta? </span>
+            <span>Ainda não tem uma conta? </span>
             <Link to="/cadastro">Cadastro</Link>
           </div>
         </form>

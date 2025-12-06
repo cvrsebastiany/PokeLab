@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import "./Cadastro.css";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function Cadastro() {
   const [nome, setNome] = useState("");
   const [telefone, setTelefone] = useState("");
@@ -10,26 +12,22 @@ function Cadastro() {
   const [senha, setSenha] = useState("");
   const [perfil, setPerfil] = useState("");
   const [mostrarSenha, setMostrarSenha] = useState(false);
-
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
   const navegar = useNavigate();
 
+  // Formata telefone no padrão (99) 99999-9999
   function formatoTelefone(value) {
     const numbers = value.replace(/\D/g, "");
-
     if (numbers.length > 11) return telefone;
-
     if (numbers.length <= 2) return `(${numbers}`;
-    if (numbers.length <= 7)
-      return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`;
-
-    return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(
-      7
-    )}`;
+    if (numbers.length <= 7) return `(${numbers.slice(0, 2)}) ${numbers.slice(2)}`;
+    return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7)}`;
   }
 
+  // Valida campos do formulário
   function formatoValido() {
     const telefoneValido = /^\(\d{2}\) \d{5}-\d{4}$/.test(telefone);
-
     return (
       nome.trim() !== "" &&
       telefoneValido &&
@@ -41,28 +39,77 @@ function Cadastro() {
 
   async function handleSubmit(e) {
     e.preventDefault();
-
     if (!formatoValido()) return;
+    setLoading(true);
+    setError("");
 
-    alert("Cadastro realizado com sucesso!");
-    navegar("/", { replace: true });
+    try {
+      // Converte perfil em perfilId
+      const perfilMap = {
+        treinador: 1,
+        profissionalSaude: 2,
+        tecnicoLaboratorio: 3,
+      };
 
-    // ##Com o Back funcional:
-    // const data = { nome, telefone, email, senha, perfil };
+      const body = {
+        nome,
+        telefone,
+        email,
+        senha,
+        perfilId: perfilMap[perfil],
+        ativo: true,
+      };
 
-    // try {
-    //   await api.post("/cadastro", data);
-    //   alert("Cadastro realizado com sucesso!");
-    //   navigate("/login");
-    // } catch {
-    //   alert("Erro ao realizar cadastro");
-    // }
+      const response = await fetch(`${API_URL}/usuarios`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+
+      const text = await response.text();
+      let data;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        data = { message: text };
+      }
+
+      if (!response.ok) {
+        throw new Error(data.message || "Erro ao criar usuário");
+      }
+
+      alert("Cadastro realizado com sucesso!");
+      navegar("/", { replace: true });
+    } catch (err) {
+      console.error("Erro no cadastro:", err);
+      setError(err.message || "Erro ao criar conta");
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
     <div className="cadastro-container">
       <div className="cadastro-card">
         <h1 className="cadastro-title">Cadastro</h1>
+
+        {error && (
+          <div
+            className="error-message"
+            style={{
+              backgroundColor: "#fee",
+              color: "#c33",
+              padding: "10px",
+              borderRadius: "5px",
+              marginBottom: "15px",
+              textAlign: "center",
+            }}
+          >
+            {error}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit}>
           <div className="cadastro-group">
@@ -73,6 +120,7 @@ function Cadastro() {
               value={nome}
               onChange={(e) => setNome(e.target.value)}
               required
+              disabled={loading}
             />
           </div>
 
@@ -84,6 +132,7 @@ function Cadastro() {
               value={telefone}
               onChange={(e) => setTelefone(formatoTelefone(e.target.value))}
               required
+              disabled={loading}
             />
           </div>
 
@@ -95,6 +144,7 @@ function Cadastro() {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
+              disabled={loading}
             />
           </div>
 
@@ -107,6 +157,7 @@ function Cadastro() {
                 value={senha}
                 onChange={(e) => setSenha(e.target.value)}
                 required
+                disabled={loading}
               />
 
               <button
@@ -114,6 +165,7 @@ function Cadastro() {
                 className="toggle-senha"
                 onClick={() => setMostrarSenha(!mostrarSenha)}
                 aria-label={mostrarSenha ? "Ocultar senha" : "Mostrar senha"}
+                disabled={loading}
               >
                 {mostrarSenha ? <FiEyeOff /> : <FiEye />}
               </button>
@@ -127,13 +179,12 @@ function Cadastro() {
                 value={perfil}
                 onChange={(e) => setPerfil(e.target.value)}
                 required
+                disabled={loading}
               >
                 <option value="">Selecione</option>
                 <option value="treinador">Treinador</option>
                 <option value="profissionalSaude">Profissional da Saúde</option>
-                <option value="tecnicoLaboratorio">
-                  Técnico de Laboratório
-                </option>
+                <option value="tecnicoLaboratorio">Técnico de Laboratório</option>
               </select>
             </div>
           </div>
@@ -141,9 +192,9 @@ function Cadastro() {
           <button
             className="cadastro-button"
             type="submit"
-            disabled={!formatoValido()}
+            disabled={!formatoValido() || loading}
           >
-            Criar conta
+            {loading ? "Cadastrando..." : "Criar conta"}
           </button>
         </form>
 
