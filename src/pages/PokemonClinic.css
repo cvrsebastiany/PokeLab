@@ -16,6 +16,34 @@
   width: 100%;
 }
 
+.clinic-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding: 1rem 2rem 0 2rem;
+}
+
+.trainer-link-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #4a90e2;
+  color: #fff;
+  text-decoration: none;
+  padding: 0.65rem 1rem;
+  border-radius: 10px;
+  font-weight: 600;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  transition: background 0.2s, transform 0.1s;
+}
+
+.trainer-link-btn:hover {
+  background: #3c7ac0;
+}
+
+.trainer-link-btn:active {
+  transform: translateY(1px);
+}
+
 .tabs {
   display: flex;
   border-bottom: 2px solid #f0f0f0;

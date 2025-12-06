@@ -7,6 +7,10 @@ const dummyPokemons = [
   
 ];
 
+const API_BASE = 'https://saudedigital.ufcspa.edu.br/pokelab-api';
+const API_POKEMON_URL = `${API_BASE}/pokemon`;
+
+
 /**
  * Função REAL para buscar dados do Pokémon na PokeAPI
  * @param {string} name - Nome do Pokémon
@@ -60,11 +64,12 @@ const PokemonTrainer = () => {
   const [pokemonStatus, setPokemonStatus] = useState(null);
   const [registeredPokemons, setRegisteredPokemons] = useState(dummyPokemons);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState('');
 
   // Efeito para buscar o status do Pokémon (com debounce para não sobrecarregar a API)
   useEffect(() => {
-    if (!pokemonName.trim()) {
+    if (!species.trim()) {
       setPokemonStatus(null);
       setError('');
       return;
@@ -76,24 +81,21 @@ const PokemonTrainer = () => {
     const delayDebounceFn = setTimeout(async () => {
       setIsLoading(true);
       try {
-        const status = await fetchPokemonStatus(pokemonName);
+        const status = await fetchPokemonStatus(species);
         setPokemonStatus(status);
-        // Garante que o tipo é setado para facilitar a validação posterior
-        if (status && !status.type) status.type = 'Unknown'; 
+        if (status && !status.type) status.type = 'Unknown';
       } catch (e) {
-        // Exibe o erro retornado pela função de busca
         setError(e.message || 'Erro desconhecido ao buscar o Pokémon.');
         setPokemonStatus(null);
       } finally {
         setIsLoading(false);
       }
-    }, 800); // 800ms de atraso após a digitação parar
+    }, 800);
 
-    // Função de limpeza: cancela o timer se o nome mudar ou o componente for desmontado
     return () => clearTimeout(delayDebounceFn);
-  }, [pokemonName]);
+  }, [species]);
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
     
     if (!pokemonName.trim() || !species.trim()) {
@@ -106,30 +108,69 @@ const PokemonTrainer = () => {
         return;
     }
 
+    if (isSaving) return;
+
     if (!pokemonStatus) {
         setError('Não foi possível obter os dados do Pokémon. Verifique o nome e tente novamente.');
         return;
     }
 
-    const newPokemon = {
-      id: Date.now(),
-      name: pokemonName.trim().charAt(0).toUpperCase() + pokemonName.trim().slice(1).toLowerCase(), // Nome capitalizado
-      species: species.trim(),
-      status: pokemonStatus,
-      progress: 'Aguardando triagem',
-      diagnosis: 'Aguardando',
-    };
-
-    setRegisteredPokemons(prev => [...prev, newPokemon]);
-    
-    // Resetar formulário
-    setPokemonName('');
-    setSpecies('');
-    setPokemonStatus(null);
     setError('');
-    
-    alert(`Pokémon ${newPokemon.name} registrado com sucesso!`);
-    setActiveTab('list');
+    setIsSaving(true);
+
+    try {
+      const trainerId = 1;
+
+      const payload = {
+        name: pokemonName.trim(),
+        species: species.trim(),
+        type: pokemonStatus.type,
+        hp: pokemonStatus.hp,
+        attack: pokemonStatus.attack,
+        defense: pokemonStatus.defense,
+        trainerId,
+      };
+
+      const response = await fetch(API_POKEMON_URL, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        const errorBody = await response.json().catch(() => ({}));
+        throw new Error(errorBody.message || 'Erro ao cadastrar Pokémon na API.');
+      }
+
+      const saved = await response.json().catch(() => null);
+
+      const newPokemon = {
+        id: saved?.id ?? Date.now(),
+        name: pokemonName.trim().charAt(0).toUpperCase() + pokemonName.trim().slice(1).toLowerCase(), // Nome capitalizado
+        species: species.trim(),
+        status: pokemonStatus,
+        progress: 'Aguardando triagem',
+        diagnosis: 'Aguardando',
+      };
+
+      setRegisteredPokemons(prev => [...prev, newPokemon]);
+      
+      // Resetar formulário
+      setPokemonName('');
+      setSpecies('');
+      setPokemonStatus(null);
+      setError('');
+      
+      alert(`Pokémon ${newPokemon.name} registrado com sucesso!`);
+      setActiveTab('list');
+    } catch (apiError) {
+      setError(apiError.message || 'Erro ao salvar o Pokémon.');
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const renderStatusCard = () => (
@@ -171,26 +212,7 @@ const PokemonTrainer = () => {
           id="species"
           type="text"
           value={species}
-          onChange={async (e) => {
-            const value = e.target.value;
-            setSpecies(value);
-            // Busca espécie na API se preenchido
-            if (value.trim()) {
-              try {
-                setIsLoading(true);
-                const status = await fetchPokemonStatus(value);
-                setPokemonStatus(status);
-                setError('');
-              } catch (err) {
-                setError('Espécie não encontrada na PokeAPI.');
-                setPokemonStatus(null);
-              } finally {
-                setIsLoading(false);
-              }
-            } else {
-              setPokemonStatus(null);
-            }
-          }}
+          onChange={(e) => setSpecies(e.target.value)}
           placeholder="Ex: Pikachu, Bulbasaur..."
           required
         />
@@ -200,8 +222,8 @@ const PokemonTrainer = () => {
 
       {error && <p className="error-message">⚠️ {error}</p>}
       
-      <button type="submit" className="register-button" disabled={isLoading || !pokemonStatus}>
-        {isLoading ? 'Aguarde a busca...' : 'Cadastrar Pokémon'}
+      <button type="submit" className="register-button" disabled={isLoading || isSaving || !pokemonStatus}>
+        {isSaving ? 'Salvando...' : isLoading ? 'Aguarde a busca...' : 'Cadastrar Pokémon'}
       </button>
     </form>
   );

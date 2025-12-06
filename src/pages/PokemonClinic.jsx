@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import Header from '../components/Header'
 import PokemonSidebar from '../components/PokemonSidebar'
 import TestTable from '../components/TestTable'
@@ -23,6 +24,12 @@ function PokemonClinic() {
         <PokemonSidebar pokemon={pokemonData} />
 
         <main className="main-content">
+          <div className="clinic-actions">
+            <Link to="/treinador" className="trainer-link-btn">
+              Ir para Treinador
+            </Link>
+          </div>
+
           <div className="tabs">
             {tabs.map(tab => (
               <button
