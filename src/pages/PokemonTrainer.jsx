@@ -56,7 +56,7 @@ const fetchPokemonStatus = async (name) => {
 const PokemonTrainer = () => {
   const [activeTab, setActiveTab] = useState('register');
   const [pokemonName, setPokemonName] = useState('');
-  const [symptoms, setSymptoms] = useState('');
+  const [species, setSpecies] = useState('');
   const [pokemonStatus, setPokemonStatus] = useState(null);
   const [registeredPokemons, setRegisteredPokemons] = useState(dummyPokemons);
   const [isLoading, setIsLoading] = useState(false);
@@ -96,9 +96,9 @@ const PokemonTrainer = () => {
   const handleRegister = (e) => {
     e.preventDefault();
     
-    if (!pokemonName.trim() || !symptoms.trim()) {
-        setError('Por favor, preencha o nome do Pokémon e os sintomas.');
-        return;
+    if (!pokemonName.trim() || !species.trim()) {
+      setError('Por favor, preencha o nome do seu Pokémon e a espécie.');
+      return;
     }
     
     if (isLoading) {
@@ -114,7 +114,7 @@ const PokemonTrainer = () => {
     const newPokemon = {
       id: Date.now(),
       name: pokemonName.trim().charAt(0).toUpperCase() + pokemonName.trim().slice(1).toLowerCase(), // Nome capitalizado
-      symptoms: symptoms.trim(),
+      species: species.trim(),
       status: pokemonStatus,
       progress: 'Aguardando triagem',
       diagnosis: 'Aguardando',
@@ -124,7 +124,7 @@ const PokemonTrainer = () => {
     
     // Resetar formulário
     setPokemonName('');
-    setSymptoms('');
+    setSpecies('');
     setPokemonStatus(null);
     setError('');
     
@@ -154,30 +154,49 @@ const PokemonTrainer = () => {
   const renderRegisterTab = () => (
     <form className="register-form" onSubmit={handleRegister}>
       <div className="form-group">
-        <label htmlFor="pokemonName">Nome do Pokémon</label>
+        <label htmlFor="pokemonName">Nome do seu Pokémon</label>
         <input 
           id="pokemonName"
           type="text"
           value={pokemonName}
           onChange={(e) => setPokemonName(e.target.value)}
-          placeholder="Ex: Pikachu, Bulbasaur..."
+          placeholder="Ex: Roberto, Marcos, Muriel..."
           required
         />
       </div>
 
       <div className="form-group">
-        <label htmlFor="symptoms">Sintomas</label>
-        <textarea
-          id="symptoms"
-          rows="4"
-          value={symptoms}
-          onChange={(e) => setSymptoms(e.target.value)}
-          placeholder="Descreva os sintomas do seu Pokémon (Ex: Não quer comer, está com febre, tosse, etc.)"
+        <label htmlFor="species">Espécie do Pokémon</label>
+        <input
+          id="species"
+          type="text"
+          value={species}
+          onChange={async (e) => {
+            const value = e.target.value;
+            setSpecies(value);
+            // Busca espécie na API se preenchido
+            if (value.trim()) {
+              try {
+                setIsLoading(true);
+                const status = await fetchPokemonStatus(value);
+                setPokemonStatus(status);
+                setError('');
+              } catch (err) {
+                setError('Espécie não encontrada na PokeAPI.');
+                setPokemonStatus(null);
+              } finally {
+                setIsLoading(false);
+              }
+            } else {
+              setPokemonStatus(null);
+            }
+          }}
+          placeholder="Ex: Pikachu, Bulbasaur..."
           required
         />
       </div>
 
-      {pokemonName && renderStatusCard()}
+      {species && renderStatusCard()}
 
       {error && <p className="error-message">⚠️ {error}</p>}
       
@@ -197,7 +216,7 @@ const PokemonTrainer = () => {
             <tr>
               <th>Pokémon</th>
               <th>Tipo</th>
-              <th>Sintomas</th>
+              <th>Espécie</th>
               <th>Progresso</th>
               <th>Diagnóstico</th>
             </tr>
@@ -206,9 +225,8 @@ const PokemonTrainer = () => {
             {registeredPokemons.map(p => (
               <tr key={p.id}>
                 <td><strong>{p.name}</strong></td>
-                {/* O tipo é convertido para minúsculo para a classe CSS */}
                 <td><span className={`type-tag type-${p.status.type.toLowerCase()}`}>{p.status.type}</span></td> 
-                <td>{p.symptoms}</td>
+                <td>{p.species}</td>
                 <td><span className={`progress-tag progress-${p.progress.toLowerCase().split(' ').join('-')}`}>{p.progress}</span></td>
                 <td>{p.diagnosis}</td>
               </tr>
