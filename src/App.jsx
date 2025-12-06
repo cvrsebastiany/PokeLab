@@ -11,7 +11,7 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/cadastro" element={<Cadastro />}/>
-        <Route path="/pokelab" element={<PokemonClinic />} />
+        <Route path="/atendimento" element={<PokemonClinic />} />
         <Route path="/treinador" element={<PokemonTrainer />} />
         <Route path="/" element={<Navigate to="/login" replace />} />
       </Routes>
