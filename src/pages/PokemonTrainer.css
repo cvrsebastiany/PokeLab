@@ -1,0 +1,237 @@
+/* --- Base CSS (Fornecido) --- */
+.container {
+    display: flex;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    width: 100%;
+    /* Ajustado para preencher a tela, considerando o cabeçalho (se houver) */
+    height: calc(100vh - 64px); 
+}
+
+.main-content {
+    flex: 1;
+    background: white;
+    border-radius: 12px;
+    padding: 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    overflow: hidden;
+    width: 100%;
+}
+
+.tabs {
+    display: flex;
+    border-bottom: 2px solid #f0f0f0;
+    padding: 0 2rem;
+}
+
+.tab {
+    background: none;
+    border: none;
+    padding: 1rem 1.5rem;
+    cursor: pointer;
+    color: #999;
+    font-weight: 500;
+    position: relative;
+    transition: color 0.2s;
+}
+
+.tab:hover {
+    color: #666;
+}
+
+.tab.active {
+    color: #4a90e2; /* Azul para aba ativa */
+}
+
+.tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: #4a90e2;
+}
+
+/* Removido .clinical-analysis pois não é usado nesta tela */
+
+.tab-content {
+    padding: 2rem;
+}
+
+.tab-content h3 {
+    font-size: 1.25rem; /* Aumentei um pouco para destaque */
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 0.5rem;
+}
+
+.tab-content p {
+    color: #666;
+}
+
+@media (max-width: 1024px) {
+    .container {
+        flex-direction: column;
+    }
+}
+
+/* --- Estilos da Aba de Cadastro --- */
+
+.register-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    max-width: 600px; 
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.form-group label {
+    display: block;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 0.5rem;
+}
+
+.form-group input[type="text"],
+.form-group textarea {
+    width: 100%;
+    padding: 0.75rem;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 1rem;
+    box-sizing: border-box; /* Garante que padding não estoure o width */
+}
+
+.form-group textarea {
+    resize: vertical;
+}
+
+.register-button {
+    background-color: #4a90e2;
+    color: white;
+    padding: 1rem 1.5rem;
+    border: none;
+    border-radius: 6px;
+    font-size: 1.125rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-top: 1rem;
+}
+
+.register-button:hover {
+    background-color: #357ABD;
+}
+
+.error-message {
+    color: #D32F2F; /* Vermelho */
+    background-color: #FFEBEE;
+    border: 1px solid #D32F2F;
+    padding: 0.75rem;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+/* --- Estilos do Cartão de Status --- */
+
+.status-card {
+    background: #f9f9f9;
+    border: 1px solid #eee;
+    padding: 1.5rem;
+    border-radius: 8px;
+    margin-top: 1rem;
+}
+
+.status-card h3 {
+    margin-top: 0;
+    margin-bottom: 1rem;
+    font-size: 1rem;
+    color: #1a1a1a;
+    border-bottom: none;
+    padding-bottom: 0;
+}
+
+.status-details p {
+    margin: 0.5rem 0;
+    font-size: 0.95rem;
+}
+
+/* --- Estilos da Aba de Lista --- */
+
+.pokemon-list table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+}
+
+.pokemon-list th,
+.pokemon-list td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.pokemon-list th {
+    background-color: #f5f5f5;
+    color: #555;
+    font-weight: 600;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+}
+
+.pokemon-list tr:hover {
+    background-color: #fafafa;
+}
+
+.no-pokemons {
+    text-align: center;
+    padding: 3rem;
+    color: #777;
+    font-style: italic;
+    background: #fdfdfd;
+    border-radius: 8px;
+}
+
+/* --- Estilos de Tags de Tipo e Progresso --- */
+
+.type-tag,
+.progress-tag {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: white;
+    text-transform: uppercase;
+}
+
+/* Cores de Tipo (Exemplos) */
+.type-electric { background-color: #f7d02c; color: #333; }
+.type-fire { background-color: #ee8130; }
+.type-grass { background-color: #7ac74c; }
+.type-water { background-color: #6390f0; }
+.type-normal { background-color: #a8a878; }
+.type-bug { background-color: #a6b91a; }
+.type-poison { background-color: #a33ea1; }
+.type-flying { background-color: #a98ff3; }
+.type-fairy { background-color: #d685ad; }
+.type-psychic { background-color: #f95587; }
+.type-rock { background-color: #b6a136; }
+.type-ground { background-color: #e2bf65; color: #333; }
+.type-steel { background-color: #b7b7ce; color: #333; }
+.type-ghost { background-color: #735797; }
+.type-fighting { background-color: #c22e28; }
+.type-ice { background-color: #96d9d6; color: #333; }
+.type-dragon { background-color: #6f35fc; }
+.type-dark { background-color: #705746; }
+.type-unknown { background-color: #68A090; }
+
+/* Cores de Progresso (Exemplos) */
+.progress-aguardando-triagem { background-color: #90a4ae; } /* Azul acinzentado */
+.progress-em-analise { background-color: #ffb300; } /* Amarelo */
+.progress-em-tratamento { background-color: #4a90e2; } /* Azul principal */
+.progress-curado { background-color: #66bb6a; } /* Verde */
