@@ -1,0 +1,62 @@
+.test-section h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.test-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.test-table thead {
+  background: #f8f9fa;
+}
+
+.test-table th {
+  text-align: left;
+  padding: 0.75rem;
+  font-weight: 600;
+  color: #666;
+  border-bottom: 2px solid #e9ecef;
+}
+
+.test-table td {
+  padding: 0.875rem 0.75rem;
+  border-bottom: 1px solid #f0f0f0;
+  color: #333;
+}
+
+.test-table tbody tr:hover {
+  background: #fafafa;
+}
+
+.result-value {
+  font-weight: 500;
+  color: #000;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.status-badge.normal {
+  background: #d4edda;
+  color: #155724;
+}
+
+.status-badge.low {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.status-badge.high {
+  background: #fff3cd;
+  color: #856404;
+}
