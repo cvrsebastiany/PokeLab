@@ -77,6 +77,11 @@ function PokemonClinic() {
             <div className="pokemon-cards">
               {allPokemons.map((p) => (
                 <div key={p.id} className="pokemon-card">
+                  {p?.imageUrl && (
+                    <div className="card-image">
+                      <img src={p.imageUrl} alt={p?.name || 'Pokemon'} />
+                    </div>
+                  )}
                   <div className="card-header">
                     <h3>{p?.name ?? '-'}</h3>
                     <span className={`status-badge ${getStatusClass(p?.status)}`}>

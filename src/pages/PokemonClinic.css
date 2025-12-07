@@ -39,11 +39,28 @@
   padding: 1rem 1.5rem;
   box-shadow: 0 2px 6px rgba(0,0,0,0.1);
   transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .pokemon-card:hover {
   transform: translateY(-3px);
   box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+}
+
+/* Card image */
+.card-image {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.card-image img {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
 }
 
 /* Card header */
@@ -52,6 +69,7 @@
   justify-content: space-between;
   align-items: center;
   margin-bottom: 0.5rem;
+  width: 100%;
 }
 
 .card-header h3 {
