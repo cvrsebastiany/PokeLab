@@ -20,6 +20,8 @@ function PokemonClinic() {
   const [isLoadingExams, setIsLoadingExams] = useState(false);
   const [showExamForm, setShowExamForm] = useState(false);
   const [examType, setExamType] = useState('hemograma');
+  const [isEditingStatus, setIsEditingStatus] = useState(false);
+  const [newStatus, setNewStatus] = useState('');
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -54,19 +56,27 @@ function PokemonClinic() {
   }, []);
 
   const getStatusClass = (status) => {
-  switch (status?.toLowerCase()) {
-    case 'healthy':
-      return 'status-healthy';
-    case 'recovered':
-      return 'status-recovered';
-    case 'in-treatment':
-      return 'status-waiting';
-    case 'sick':
-      return 'status-sick';
-    default:
-      return 'status-unknown';
-  }
-};
+    switch (status?.toLowerCase()) {
+      case 'saudável':
+        return 'status-healthy';
+      case 'curado':
+        return 'status-recovered';
+      case 'em tratamento':
+        return 'status-waiting';
+      case 'doente':
+        return 'status-sick';
+      case 'healthy':
+        return 'status-healthy';
+      case 'recovered':
+        return 'status-recovered';
+      case 'in-treatment':
+        return 'status-waiting';
+      case 'sick':
+        return 'status-sick';
+      default:
+        return 'status-unknown';
+    }
+  };
 
   const filteredPokemons = allPokemons.filter((pokemon) =>
     pokemon?.name?.toLowerCase().includes(searchTerm.toLowerCase())
@@ -103,6 +113,8 @@ function PokemonClinic() {
   const handleCardClick = (pokemon) => {
     setSelectedPokemon(pokemon);
     setShowExamForm(false);
+    setIsEditingStatus(false);
+    setNewStatus(pokemon.status || '');
     fetchPokemonExams(pokemon.id);
   };
 
@@ -143,6 +155,33 @@ function PokemonClinic() {
     setSelectedPokemon(null);
     setPokemonExams([]);
     setShowExamForm(false);
+    setIsEditingStatus(false);
+  };
+
+  const handleUpdateStatus = async () => {
+    if (!selectedPokemon || !newStatus) return;
+
+    try {
+      const response = await fetch(`${API_POKEMON_URL}/${selectedPokemon.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ status: newStatus })
+      });
+
+      if (response.ok) {
+        const updatedPokemon = await response.json();
+        setSelectedPokemon(updatedPokemon);
+        setAllPokemons(prev => prev.map(p => p.id === updatedPokemon.id ? updatedPokemon : p));
+        setIsEditingStatus(false);
+        alert('Status atualizado com sucesso!');
+      } else {
+        alert('Erro ao atualizar status.');
+      }
+    } catch (error) {
+      console.error('Error updating status:', error);
+      alert('Erro ao atualizar status.');
+    }
   };
 
 
@@ -212,9 +251,31 @@ function PokemonClinic() {
                 )}
                 <div>
                   <h2>{selectedPokemon.name}</h2>
-                  <span className={`status-badge ${getStatusClass(selectedPokemon.status)}`}>
-                    {selectedPokemon.status}
-                  </span>
+                  <div className="status-edit-container">
+                    {isEditingStatus ? (
+                      <div className="status-edit-form">
+                        <select 
+                          value={newStatus} 
+                          onChange={(e) => setNewStatus(e.target.value)}
+                          className="status-select"
+                        >
+                          <option value="Saudável">Saudável</option>
+                          <option value="Doente">Doente</option>
+                          <option value="Em tratamento">Em tratamento</option>
+                          <option value="Curado">Curado</option>
+                        </select>
+                        <button onClick={handleUpdateStatus} className="save-status-button">Salvar</button>
+                        <button onClick={() => setIsEditingStatus(false)} className="cancel-status-button">Cancelar</button>
+                      </div>
+                    ) : (
+                      <div className="status-display">
+                        <span className={`status-badge ${getStatusClass(selectedPokemon.status)}`}>
+                          {selectedPokemon.status}
+                        </span>
+                        <button onClick={() => setIsEditingStatus(true)} className="edit-status-button">✎</button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
 
