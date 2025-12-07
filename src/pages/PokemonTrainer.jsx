@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './PokemonTrainer.css';
 import Header from '../components/Header'
+import escudoInternacional from '../assets/Escudo_do_Sport_Club_Internacional.svg.png';
 
 
 const dummyPokemons = [
@@ -290,12 +291,26 @@ const PokemonTrainer = () => {
         ) : pokemonStatus ? (
             <div className="status-details">
                 {pokemonStatus.imageUrl && (
-                    <div style={{ textAlign: 'center', marginBottom: '15px' }}>
+                    <div style={{ textAlign: 'center', marginBottom: '15px', position: 'relative', width: '120px', margin: '0 auto 15px' }}>
                         <img 
                             src={pokemonStatus.imageUrl} 
                             alt={species} 
                             style={{ width: '120px', height: '120px', objectFit: 'contain' }} 
                         />
+                        {pokemonName.toLowerCase().includes('internacional') && (
+                            <img 
+                                src={escudoInternacional} 
+                                alt="Escudo Internacional" 
+                                style={{
+                                    position: 'absolute',
+                                    bottom: '0',
+                                    right: '0',
+                                    width: '40px',
+                                    height: '40px',
+                                    objectFit: 'contain'
+                                }}
+                            />
+                        )}
                     </div>
                 )}
                 {/* O tipo agora virá da API e terá a primeira letra maiúscula */}
@@ -356,7 +371,7 @@ const PokemonTrainer = () => {
         <table>
           <thead>
             <tr>
-              <th>Pokémon</th>
+              <th>Nome</th>
               <th>Tipo</th>
               <th>Imagem</th>
               <th>Espécie</th>
@@ -371,7 +386,23 @@ const PokemonTrainer = () => {
                 <td><span className={`type-tag type-${p.status.type.toLowerCase()}`}>{p.status.type}</span></td>
                 <td>
                   {p.imageUrl ? (
-                    <img src={p.imageUrl} alt={p.name} style={{ width: '60px', height: '60px', objectFit: 'contain' }} />
+                    <div style={{ position: 'relative', width: '60px', height: '60px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                      <img src={p.imageUrl} alt={p.name} style={{ width: '60px', height: '60px', objectFit: 'contain' }} />
+                      {p.name.toLowerCase().includes('internacional') && (
+                        <img 
+                          src={escudoInternacional} 
+                          alt="Escudo Internacional" 
+                          style={{
+                            position: 'absolute',
+                            bottom: '0',
+                            right: '0',
+                            width: '24px',
+                            height: '24px',
+                            objectFit: 'contain'
+                          }}
+                        />
+                      )}
+                    </div>
                   ) : (
                     <span>-</span>
                   )}
