@@ -29,6 +29,9 @@ stages:
       - job: Build_Job
         displayName: "Build Angular Application"
         steps:
+          - checkout: self
+            persistCredentials: true
+
           - task: NodeTool@0
             displayName: "Use Node.js $(NODE_VERSION)"
             inputs:
@@ -45,6 +48,12 @@ stages:
 
           - script: npm version patch -m "Version bump %s ***NO_CI***"
             displayName: "Bump version"
+            condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest')) # Run only on CI push, not PR
+
+          - script: |
+              git push origin HEAD:main
+              git push --tags
+            displayName: "Push version bump"
             condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest')) # Run only on CI push, not PR
 
           - script: npm run build
