@@ -1,0 +1,71 @@
+# Node.js that uses React
+
+trigger:
+  branches:
+    include:
+      - main
+
+pr:
+  branches:
+    include:
+      - main
+  autoCancel: false
+
+pool:
+  name: linux-agent
+  demands:
+    - npm
+
+variables:
+- name: NODE_VERSION
+  value: '22.x'
+- name: CI
+  value: false
+
+stages:
+  - stage: Build
+    displayName: Build and Test
+    jobs:
+      - job: Build_Job
+        displayName: 'Build Angular Application'
+        steps: 
+          - task: NodeTool@0
+            displayName: 'Use Node.js $(NODE_VERSION)'
+            inputs:
+              versionSpec: $(NODE_VERSION)
+          - script: npm install
+            displayName: 'Install dependencies'
+            workingDirectory: frontend
+          - script: npm run build
+            displayName: 'Build application'
+          
+          - task: ArchiveFiles@2
+            displayName: 'Archive build files'
+            inputs:
+              rootFolderOrFile: '$(System.DefaultWorkingDirectory)/dist/'
+              includeRootFolder: false
+              archiveType: 'zip'
+              archiveFile: '$(Build.ArtifactStagingDirectory)/$(Build.BuildId).zip'
+              replaceExistingArchive: true
+              verbose: true
+            
+  - stage: Deploy
+    displayName: 'Deploy Application'
+    dependsOn: Build
+    condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest')) # Run only on CI push, not PR
+    jobs:
+    - deployment: Deploy_to_Server 
+      displayName: 'Deploy to Apache Server'
+      environment: 'Producao-Servidor-Web'
+      strategy:
+        runOnce:
+          deploy:
+            steps:
+            - download: none
+            - task: CopyFiles@2
+              displayName: 'Copia arquivos para o diretório /seeds.ufcspa.edu.br/desenv/'
+              inputs:
+                SourceFolder: 'dist'
+                Contents: '**'
+                TargetFolder: '/var/www/pokelab.local/dist/'
+                CleanTargetFolder: true
