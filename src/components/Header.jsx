@@ -1,7 +1,7 @@
 import { logout } from '../utils/api';
 import './Header.css'
 
-function Header() {
+function Header({ user }) {
   const handleLogout = async () => {
     if (window.confirm('Deseja realmente sair?')) {
       await logout();
@@ -15,10 +15,17 @@ function Header() {
         <h1>PokéLab</h1>
       </div>
       <div className="header-right">
-        <button className="btn-primary">Save Record</button>
-        <button className="btn-secondary">Print Record</button>
+        {user && (
+          <div className="user-info">
+            <div className="user-details">
+              <span className="user-name">{user.nome}</span>
+              <span className="user-profile">{user.perfil?.nome || 'Usuário'}</span>
+            </div>
+            <div className="user-avatar">👤</div>
+          </div>
+        )}
+        {!user && <div className="user-avatar">👤</div>}
         <button className="btn-logout" onClick={handleLogout}>Sair</button>
-        <div className="user-avatar">👤</div>
       </div>
     </header>
   )

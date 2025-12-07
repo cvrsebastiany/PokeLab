@@ -312,7 +312,7 @@ const PokemonTrainer = () => {
 
   return (
     <>
-      <Header />
+      <Header user={currentUser} />
       <div className="container">
         <div className="main-content">
           <div className="tabs">

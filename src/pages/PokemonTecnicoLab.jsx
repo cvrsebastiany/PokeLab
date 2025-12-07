@@ -1,7 +1,10 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Header from "../components/Header";
 import PokemonSidebar from "../components/PokemonSidebar";
 import "./PokemonTecnicoLab.css";
+
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3004/pokelab-api';
+const API_AUTH_ME_URL = `${API_BASE}/auth/me`;
 
 function PokemonTecnicoLab() {
   const pokemons = [
@@ -40,6 +43,26 @@ function PokemonTecnicoLab() {
   const [abaAtiva, setAbaAtiva] = useState("resumo");
   const [exameSelecionado, setExameSelecionado] = useState(null);
   const [observacoes, setObservacoes] = useState("");
+  const [currentUser, setCurrentUser] = useState(null);
+
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      try {
+        const response = await fetch(API_AUTH_ME_URL, {
+          credentials: 'include',
+        });
+        
+        if (response.ok) {
+          const userData = await response.json();
+          setCurrentUser(userData);
+        }
+      } catch (error) {
+        console.error('Error fetching current user:', error);
+      }
+    };
+
+    fetchCurrentUser();
+  }, []);
 
   const pokemonSidebarData = pokemonSelecionado || {
     nome: "Nenhum Pokémon selecionado",
@@ -49,7 +72,7 @@ function PokemonTecnicoLab() {
 
   return (
     <div className="app">
-      <Header />
+      <Header user={currentUser} />
 
       <div className="container">
         <PokemonSidebar pokemon={pokemonSidebarData} />
