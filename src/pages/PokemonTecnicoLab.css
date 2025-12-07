@@ -96,32 +96,38 @@
 
 .exam-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 16px;
-  margin-top: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
 }
 
 .exam-card {
   background: #fff;
-  border-radius: 10px;
-  padding: 16px;
+  border: 1px solid #e8e8e8;
+  border-radius: 12px;
+  padding: 1.5rem;
   cursor: pointer;
-  border: 1px solid #e0e0e0;
-  transition: transform 0.15s ease, box-shadow 0.15s ease;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 .exam-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
+  border-color: #4a90e2;
 }
 
-.status {
-  display: inline-block;
-  margin-top: 6px;
-  font-size: 12px;
-  padding: 4px 8px;
-  border-radius: 12px;
-  background: #f3f3f3;
+.exam-card h3 {
+  margin: 0 0 0.75rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.exam-card p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #999;
 }
 
 .exam-editor-overlay {
