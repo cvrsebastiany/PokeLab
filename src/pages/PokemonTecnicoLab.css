@@ -144,6 +144,20 @@
   color: #f0ad4e;
 }
 
+.exam-card .exam-status.exam-status-concluido {
+  color: #2e8b57;
+}
+
+.exam-card .exam-status.exam-status-outro {
+  color: #555;
+}
+
+.exam-completed-at {
+  margin: -0.25rem 0 0.5rem;
+  font-size: 0.8rem;
+  color: #4f4f4f;
+}
+
 .exam-editor-overlay {
   position: fixed;
   inset: 0;

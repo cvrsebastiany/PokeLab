@@ -402,8 +402,12 @@ function PokemonTecnicoLab() {
               examesDosPokemonSelecionado.length > 0 ? (
                 examesDosPokemonSelecionado.map((exame) => {
                   const examId = exame.id ?? exame.exameId ?? exame.codigo;
-                  const isPendente = exame.status === "Pendente" || exame.status === "pendente";
+                  const statusNormalized = (exame.status || "").toString().toLowerCase();
+                  const isPendente = statusNormalized === "pendente";
+                  const isConcluido = statusNormalized.startsWith("conclu");
                   const examNome = exame.tipoExame || exame.tipo || exame.nome || exame.name || `Exame #${examId}`;
+                  const dataConclusao = exame.dataResultado || exame.dataresultado || exame.data_conclusao;
+                  const statusClass = isConcluido ? "concluido" : isPendente ? "pendente" : "outro";
                   // Extract field names from the exam object (exclude metadata)
                   const metadataKeys = new Set(['id', 'pokemon', 'pokemonId', 'tecnico', 'tecnicoId', 'status', 'observacoes', 'dataColeta', 'dataResultado', 'createdAt', 'updatedAt', 'tipoExame']);
                   const examCampos = Object.keys(exame).filter(key => !metadataKeys.has(key));
@@ -417,8 +421,13 @@ function PokemonTecnicoLab() {
                       }}
                     >
                       <h3>{examNome}</h3>
-                      <p className="exam-status">{exame.status}</p>
-                      <p>{isPendente ? "Clique para preencher resultados" : "Exame já finalizado"}</p>
+                      <p className={`exam-status exam-status-${statusClass}`}>{exame.status}</p>
+                      {isConcluido && dataConclusao && (
+                        <p className="exam-completed-at">
+                          {`Concluído em ${new Date(dataConclusao).toLocaleString('pt-BR')}`}
+                        </p>
+                      )}
+                      {isPendente && <p>Clique para preencher resultados</p>}
                     </div>
                   );
                 })
