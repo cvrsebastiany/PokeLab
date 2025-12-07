@@ -46,9 +46,13 @@ const fetchPokemonStatus = async (name) => {
       ? data.types[0].type.name.charAt(0).toUpperCase() + data.types[0].type.name.slice(1) // Capitaliza o tipo
       : 'Unknown';
 
+    // Pega a URL da imagem Dream World do Pokémon (SVG de alta qualidade)
+    const imageUrl = data.sprites?.other?.dream_world?.front_default || data.sprites?.other?.['official-artwork']?.front_default || data.sprites?.front_default || null;
+
     return { 
       ...stats, 
-      type 
+      type,
+      imageUrl
     };
     
   } catch (error) {
@@ -126,6 +130,7 @@ const PokemonTrainer = () => {
             id: pokemon.id,
             name: pokemon.name,
             species: pokemon.species,
+            imageUrl: pokemon.imageUrl,
             status: {
               type: pokemon.type,
               hp: pokemon.hp,
@@ -229,6 +234,7 @@ const PokemonTrainer = () => {
         attack: pokemonStatus.attack,
         defense: pokemonStatus.defense,
         trainerId,
+        imageUrl: pokemonStatus.imageUrl,
       };
 
       const response = await fetch(API_POKEMON_URL, {
@@ -252,6 +258,7 @@ const PokemonTrainer = () => {
         id: saved?.id ?? Date.now(),
         name: pokemonName.trim().charAt(0).toUpperCase() + pokemonName.trim().slice(1).toLowerCase(), // Nome capitalizado
         species: species.trim(),
+        imageUrl: pokemonStatus.imageUrl,
         status: pokemonStatus,
         progress: 'Aguardando triagem',
         diagnosis: 'Aguardando',
@@ -282,6 +289,15 @@ const PokemonTrainer = () => {
             <p>Carregando dados da PokeAPI...</p>
         ) : pokemonStatus ? (
             <div className="status-details">
+                {pokemonStatus.imageUrl && (
+                    <div style={{ textAlign: 'center', marginBottom: '15px' }}>
+                        <img 
+                            src={pokemonStatus.imageUrl} 
+                            alt={species} 
+                            style={{ width: '120px', height: '120px', objectFit: 'contain' }} 
+                        />
+                    </div>
+                )}
                 {/* O tipo agora virá da API e terá a primeira letra maiúscula */}
                 <p><strong>Tipo:</strong> <span className={`type-tag type-${pokemonStatus.type.toLowerCase()}`}>{pokemonStatus.type}</span></p>
                 <p><strong>HP (Vida):</strong> {pokemonStatus.hp}</p>
@@ -342,6 +358,7 @@ const PokemonTrainer = () => {
             <tr>
               <th>Pokémon</th>
               <th>Tipo</th>
+              <th>Imagem</th>
               <th>Espécie</th>
               <th>Progresso</th>
               <th>Diagnóstico</th>
@@ -351,7 +368,14 @@ const PokemonTrainer = () => {
             {registeredPokemons.map(p => (
               <tr key={p.id}>
                 <td><strong>{p.name}</strong></td>
-                <td><span className={`type-tag type-${p.status.type.toLowerCase()}`}>{p.status.type}</span></td> 
+                <td><span className={`type-tag type-${p.status.type.toLowerCase()}`}>{p.status.type}</span></td>
+                <td>
+                  {p.imageUrl ? (
+                    <img src={p.imageUrl} alt={p.name} style={{ width: '60px', height: '60px', objectFit: 'contain' }} />
+                  ) : (
+                    <span>-</span>
+                  )}
+                </td>
                 <td>{p.species}</td>
                 <td><span className={`progress-tag progress-${p.progress.toLowerCase().split(' ').join('-')}`}>{p.progress}</span></td>
                 <td>{p.diagnosis}</td>
