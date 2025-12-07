@@ -9,6 +9,7 @@ const API_POKEMON_URL = `${API_BASE}/pokemon`;
 const API_EXAMES_URL = `${API_BASE}/exames`;
 const API_EXAMES_BIOQUIMICA_URL = `${API_BASE}/exames-bioquimica`;
 const API_EXAMES_URINA_URL = `${API_BASE}/exames-urina`;
+const API_TREATMENT_UPDATES_URL = `${API_BASE}/treatment-updates`;
 
 function PokemonClinic() {
   const [currentUser, setCurrentUser] = useState(null);
@@ -22,6 +23,10 @@ function PokemonClinic() {
   const [examType, setExamType] = useState('hemograma');
   const [isEditingStatus, setIsEditingStatus] = useState(false);
   const [newStatus, setNewStatus] = useState('');
+  const [treatmentUpdates, setTreatmentUpdates] = useState([]);
+  const [isLoadingUpdates, setIsLoadingUpdates] = useState(false);
+  const [showUpdateForm, setShowUpdateForm] = useState(false);
+  const [newUpdate, setNewUpdate] = useState('');
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -110,12 +115,36 @@ function PokemonClinic() {
     }
   };
 
+  const fetchTreatmentUpdates = async (pokemonId) => {
+    setIsLoadingUpdates(true);
+    try {
+      const response = await fetch(`${API_TREATMENT_UPDATES_URL}?pokemonId=${pokemonId}`, { 
+        credentials: 'include' 
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setTreatmentUpdates(Array.isArray(data) ? data.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt)) : []);
+      } else {
+        setTreatmentUpdates([]);
+      }
+    } catch (error) {
+      console.error('Error fetching treatment updates:', error);
+      setTreatmentUpdates([]);
+    } finally {
+      setIsLoadingUpdates(false);
+    }
+  };
+
   const handleCardClick = (pokemon) => {
     setSelectedPokemon(pokemon);
     setShowExamForm(false);
     setIsEditingStatus(false);
     setNewStatus(pokemon.status || '');
+    setShowUpdateForm(false);
+    setNewUpdate('');
     fetchPokemonExams(pokemon.id);
+    fetchTreatmentUpdates(pokemon.id);
   };
 
   const handleRequestExam = async () => {
@@ -156,6 +185,46 @@ function PokemonClinic() {
     setPokemonExams([]);
     setShowExamForm(false);
     setIsEditingStatus(false);
+    setTreatmentUpdates([]);
+    setShowUpdateForm(false);
+    setNewUpdate('');
+  };
+
+  const handleAddTreatmentUpdate = async () => {
+    if (!selectedPokemon || !newUpdate.trim()) {
+      alert('Por favor, escreva uma atualização.');
+      return;
+    }
+
+    if (!currentUser?.id) {
+      alert('Usuário não autenticado.');
+      return;
+    }
+
+    try {
+      const response = await fetch(API_TREATMENT_UPDATES_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          pokemonId: selectedPokemon.id,
+          medicoId: currentUser.id,
+          description: newUpdate.trim()
+        })
+      });
+
+      if (response.ok) {
+        alert('Atualização de tratamento adicionada com sucesso!');
+        setNewUpdate('');
+        setShowUpdateForm(false);
+        fetchTreatmentUpdates(selectedPokemon.id);
+      } else {
+        alert('Erro ao adicionar atualização de tratamento.');
+      }
+    } catch (error) {
+      console.error('Error adding treatment update:', error);
+      alert('Erro ao adicionar atualização de tratamento.');
+    }
   };
 
   const handleUpdateStatus = async () => {
@@ -286,6 +355,55 @@ function PokemonClinic() {
                 <p><strong>Treinador:</strong> {selectedPokemon.trainer?.nome || '-'}</p>
                 <p><strong>Último Checkup:</strong> {selectedPokemon.lastCheckup ? new Date(selectedPokemon.lastCheckup).toLocaleDateString() : '-'}</p>
                 <p><strong>Notas:</strong> {selectedPokemon.notes || '-'}</p>
+              </div>
+
+              <div className="panel-treatment-updates">
+                <div className="updates-header">
+                  <h3>Atualizações de Tratamento</h3>
+                  <button 
+                    className="add-update-button"
+                    onClick={() => setShowUpdateForm(!showUpdateForm)}
+                  >
+                    {showUpdateForm ? 'Cancelar' : '+ Nova Atualização'}
+                  </button>
+                </div>
+
+                {showUpdateForm && (
+                  <div className="update-form">
+                    <textarea
+                      placeholder="Descreva a atualização do tratamento..."
+                      value={newUpdate}
+                      onChange={(e) => setNewUpdate(e.target.value)}
+                      className="update-textarea"
+                      rows="4"
+                    />
+                    <button onClick={handleAddTreatmentUpdate} className="submit-update-button">
+                      Adicionar Atualização
+                    </button>
+                  </div>
+                )}
+
+                <div className="updates-list">
+                  {isLoadingUpdates ? (
+                    <p>Carregando atualizações...</p>
+                  ) : treatmentUpdates.length === 0 ? (
+                    <p className="no-updates">Nenhuma atualização de tratamento registrada.</p>
+                  ) : (
+                    treatmentUpdates.map((update) => (
+                      <div key={update.id} className="update-card">
+                        <div className="update-header">
+                          <span className="update-date">
+                            {new Date(update.createdAt).toLocaleString('pt-BR')}
+                          </span>
+                          {update.medico && (
+                            <span className="update-author">Dr. {update.medico.nome}</span>
+                          )}
+                        </div>
+                        <p className="update-description">{update.description}</p>
+                      </div>
+                    ))
+                  )}
+                </div>
               </div>
 
               <div className="panel-exams">
