@@ -52,12 +52,35 @@
   border-radius: 20px;
   font-size: 0.875rem;
   font-weight: 500;
+  background: #f7f7f7;
+  color: #444;
 }
 
-.type-badge.electric {
-  background: #fff4d6;
-  color: #f0ad4e;
+/* Default when type is unknown */
+.type-badge.default {
+  background: #f1f1f1;
+  color: #444;
 }
+
+/* Type-based palettes for contrast (mirrors trainer card feel) */
+.type-badge.fire { background: #ffe1d6; color: #d44a1f; }
+.type-badge.water { background: #d8ecff; color: #2a74c9; }
+.type-badge.grass { background: #def4e0; color: #2f9a4c; }
+.type-badge.electric { background: #fff4d6; color: #d99400; }
+.type-badge.psychic { background: #ffe0f1; color: #c4417a; }
+.type-badge.ice { background: #e0f7ff; color: #2a94b8; }
+.type-badge.dragon { background: #e4dbff; color: #5a3ec1; }
+.type-badge.dark { background: #e6e1e1; color: #4a3f3f; }
+.type-badge.steel { background: #e7ebf0; color: #556070; }
+.type-badge.fairy { background: #ffe7f5; color: #c24f9e; }
+.type-badge.ghost { background: #e8e3ff; color: #5a54b4; }
+.type-badge.rock { background: #f1e5d5; color: #7a5a28; }
+.type-badge.ground { background: #f3e2c9; color: #8a5a2f; }
+.type-badge.fighting { background: #ffe0d9; color: #c54a3c; }
+.type-badge.poison { background: #f1e0ff; color: #7a3fb8; }
+.type-badge.bug { background: #e9f3d2; color: #6b8a1f; }
+.type-badge.flying { background: #e5f0ff; color: #4a74c4; }
+
 
 .pokemon-info {
   text-align: left;
