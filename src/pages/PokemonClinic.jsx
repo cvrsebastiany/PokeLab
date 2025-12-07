@@ -6,12 +6,20 @@ import './PokemonClinic.css';
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3004/pokelab-api';
 const API_AUTH_ME_URL = `${API_BASE}/auth/me`;
 const API_POKEMON_URL = `${API_BASE}/pokemon`;
+const API_EXAMES_URL = `${API_BASE}/exames`;
+const API_EXAMES_BIOQUIMICA_URL = `${API_BASE}/exames-bioquimica`;
+const API_EXAMES_URINA_URL = `${API_BASE}/exames-urina`;
 
 function PokemonClinic() {
   const [currentUser, setCurrentUser] = useState(null);
   const [allPokemons, setAllPokemons] = useState([]);
   const [isLoadingPokemons, setIsLoadingPokemons] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedPokemon, setSelectedPokemon] = useState(null);
+  const [pokemonExams, setPokemonExams] = useState([]);
+  const [isLoadingExams, setIsLoadingExams] = useState(false);
+  const [showExamForm, setShowExamForm] = useState(false);
+  const [examType, setExamType] = useState('hemograma');
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -64,6 +72,79 @@ function PokemonClinic() {
     pokemon?.name?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
+  const fetchPokemonExams = async (pokemonId) => {
+    setIsLoadingExams(true);
+    try {
+      const [examesRes, bioquimicaRes, urinaRes] = await Promise.all([
+        fetch(`${API_EXAMES_URL}?pokemonId=${pokemonId}`, { credentials: 'include' }),
+        fetch(`${API_EXAMES_BIOQUIMICA_URL}?pokemonId=${pokemonId}`, { credentials: 'include' }),
+        fetch(`${API_EXAMES_URINA_URL}?pokemonId=${pokemonId}`, { credentials: 'include' })
+      ]);
+
+      const exames = examesRes.ok ? await examesRes.json() : [];
+      const bioquimica = bioquimicaRes.ok ? await bioquimicaRes.json() : [];
+      const urina = urinaRes.ok ? await urinaRes.json() : [];
+
+      const allExams = [
+        ...(Array.isArray(exames) ? exames.map(e => ({ ...e, tipo: 'Hemograma' })) : []),
+        ...(Array.isArray(bioquimica) ? bioquimica.map(e => ({ ...e, tipo: 'Bioquímica' })) : []),
+        ...(Array.isArray(urina) ? urina.map(e => ({ ...e, tipo: 'Urina' })) : [])
+      ].sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+
+      setPokemonExams(allExams);
+    } catch (error) {
+      console.error('Error fetching exams:', error);
+      setPokemonExams([]);
+    } finally {
+      setIsLoadingExams(false);
+    }
+  };
+
+  const handleCardClick = (pokemon) => {
+    setSelectedPokemon(pokemon);
+    setShowExamForm(false);
+    fetchPokemonExams(pokemon.id);
+  };
+
+  const handleRequestExam = async () => {
+    if (!selectedPokemon) return;
+
+    try {
+      const examData = { pokemonId: selectedPokemon.id };
+      let url = API_EXAMES_URL;
+      
+      if (examType === 'bioquimica') {
+        url = API_EXAMES_BIOQUIMICA_URL;
+      } else if (examType === 'urina') {
+        url = API_EXAMES_URINA_URL;
+      }
+
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(examData)
+      });
+
+      if (response.ok) {
+        alert('Exame solicitado com sucesso!');
+        setShowExamForm(false);
+        fetchPokemonExams(selectedPokemon.id);
+      } else {
+        alert('Erro ao solicitar exame.');
+      }
+    } catch (error) {
+      console.error('Error requesting exam:', error);
+      alert('Erro ao solicitar exame.');
+    }
+  };
+
+  const closePanel = () => {
+    setSelectedPokemon(null);
+    setPokemonExams([]);
+    setShowExamForm(false);
+  };
+
 
   return (
     <div className="app">
@@ -91,7 +172,7 @@ function PokemonClinic() {
           ) : (
             <div className="pokemon-cards">
               {filteredPokemons.map((p) => (
-                <div key={p.id} className="pokemon-card">
+                <div key={p.id} className="pokemon-card" onClick={() => handleCardClick(p)}>
                   {p?.imageUrl && (
                     <div className="card-image">
                       <img src={p.imageUrl} alt={p?.name || 'Pokemon'} />
@@ -118,6 +199,127 @@ function PokemonClinic() {
             </div>
           )}
         </main>
+
+        {/* Detail Panel */}
+        {selectedPokemon && (
+          <div className="detail-panel-overlay" onClick={closePanel}>
+            <div className="detail-panel" onClick={(e) => e.stopPropagation()}>
+              <button className="close-button" onClick={closePanel}>×</button>
+              
+              <div className="panel-header">
+                {selectedPokemon.imageUrl && (
+                  <img src={selectedPokemon.imageUrl} alt={selectedPokemon.name} className="panel-image" />
+                )}
+                <div>
+                  <h2>{selectedPokemon.name}</h2>
+                  <span className={`status-badge ${getStatusClass(selectedPokemon.status)}`}>
+                    {selectedPokemon.status}
+                  </span>
+                </div>
+              </div>
+
+              <div className="panel-details">
+                <h3>Informações do Pokémon</h3>
+                <p><strong>Espécie:</strong> {selectedPokemon.species || '-'}</p>
+                <p><strong>Tipo:</strong> {selectedPokemon.type || '-'}</p>
+                <p><strong>Treinador:</strong> {selectedPokemon.trainer?.nome || '-'}</p>
+                <p><strong>Último Checkup:</strong> {selectedPokemon.lastCheckup ? new Date(selectedPokemon.lastCheckup).toLocaleDateString() : '-'}</p>
+                <p><strong>Notas:</strong> {selectedPokemon.notes || '-'}</p>
+              </div>
+
+              <div className="panel-exams">
+                <div className="exams-header">
+                  <h3>Exames</h3>
+                  <button 
+                    className="request-exam-button"
+                    onClick={() => setShowExamForm(!showExamForm)}
+                  >
+                    {showExamForm ? 'Cancelar' : 'Solicitar Exame'}
+                  </button>
+                </div>
+
+                {showExamForm && (
+                  <div className="exam-form">
+                    <label>
+                      Tipo de Exame:
+                      <select value={examType} onChange={(e) => setExamType(e.target.value)}>
+                        <option value="hemograma">Hemograma</option>
+                        <option value="bioquimica">Bioquímica</option>
+                        <option value="urina">Urina</option>
+                      </select>
+                    </label>
+                    <button onClick={handleRequestExam} className="submit-exam-button">
+                      Confirmar Solicitação
+                    </button>
+                  </div>
+                )}
+
+                <div className="exams-list">
+                  {isLoadingExams ? (
+                    <p>Carregando exames...</p>
+                  ) : pokemonExams.length === 0 ? (
+                    <p>Nenhum exame registrado.</p>
+                  ) : (
+                    pokemonExams.map((exam) => (
+                      <div key={`${exam.tipo}-${exam.id}`} className="exam-card">
+                        <div className="exam-header">
+                          <span className="exam-type">{exam.tipo}</span>
+                          <span className={`exam-status status-${exam.status.toLowerCase()}`}>
+                            {exam.status}
+                          </span>
+                        </div>
+                        <p><strong>Data:</strong> {new Date(exam.createdAt).toLocaleDateString()}</p>
+                        {exam.tecnico && <p><strong>Técnico:</strong> {exam.tecnico.nome}</p>}
+                        
+                        {exam.status === 'Concluído' && (
+                          <div className="exam-results">
+                            <h4>Resultados:</h4>
+                            {exam.tipo === 'Hemograma' && (
+                              <>
+                                {exam.hemoglobina && <p>Hemoglobina: {exam.hemoglobina} g/dL</p>}
+                                {exam.leucocitos && <p>Leucócitos: {exam.leucocitos} células/µL</p>}
+                                {exam.plaquetas && <p>Plaquetas: {exam.plaquetas} células/µL</p>}
+                                {exam.glicose && <p>Glicose: {exam.glicose} mg/dL</p>}
+                                {exam.ureia && <p>Ureia: {exam.ureia} mg/dL</p>}
+                                {exam.creatinina && <p>Creatinina: {exam.creatinina} mg/dL</p>}
+                                {exam.cor && <p>Cor da Urina: {exam.cor}</p>}
+                                {exam.pH && <p>pH: {exam.pH}</p>}
+                                {exam.proteinas && <p>Proteínas: {exam.proteinas} mg/dL</p>}
+                              </>
+                            )}
+                            {exam.tipo === 'Bioquímica' && (
+                              <>
+                                {exam.glicose && <p>Glicose: {exam.glicose} mg/dL</p>}
+                                {exam.ureia && <p>Ureia: {exam.ureia} mg/dL</p>}
+                                {exam.creatinina && <p>Creatinina: {exam.creatinina} mg/dL</p>}
+                                {exam.colesterolTotal && <p>Colesterol Total: {exam.colesterolTotal} mg/dL</p>}
+                                {exam.triglicerideos && <p>Triglicerídeos: {exam.triglicerideos} mg/dL</p>}
+                                {exam.alt && <p>ALT: {exam.alt} U/L</p>}
+                                {exam.ast && <p>AST: {exam.ast} U/L</p>}
+                                {exam.fosfataseAlcalina && <p>Fosfatase Alcalina: {exam.fosfataseAlcalina} U/L</p>}
+                                {exam.bilirrubinaTotal && <p>Bilirrubina Total: {exam.bilirrubinaTotal} mg/dL</p>}
+                              </>
+                            )}
+                            {exam.tipo === 'Urina' && (
+                              <>
+                                {exam.cor && <p>Cor: {exam.cor}</p>}
+                                {exam.pH && <p>pH: {exam.pH}</p>}
+                                {exam.proteinas && <p>Proteínas: {exam.proteinas} mg/dL</p>}
+                              </>
+                            )}
+                            {exam.observacoes && (
+                              <p><strong>Observações:</strong> {exam.observacoes}</p>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
