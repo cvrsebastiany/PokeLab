@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import './PokemonTrainer.css';
 import Header from '../components/Header'
 import escudoInternacional from '../assets/Escudo_do_Sport_Club_Internacional.svg.png';
+import brasaoMuriel from '../assets/melhor_professor.png';
+import gifCongratulations from '../assets/congratulations-7600.gif';
 
 
 const dummyPokemons = [
@@ -76,6 +78,7 @@ const PokemonTrainer = () => {
   const [isLoadingUser, setIsLoadingUser] = useState(true);
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
   const [isLoadingPokemons, setIsLoadingPokemons] = useState(false);
+  const [showCongratulations, setShowCongratulations] = useState(false);
 
   // Fetch current user on component mount
   useEffect(() => {
@@ -274,6 +277,12 @@ const PokemonTrainer = () => {
       setError('');
       setHasAttemptedSubmit(false);
       
+      // Mostrar gif de congratulations se for Muriel
+      if (newPokemon.name.toLowerCase().includes('muriel')) {
+        setShowCongratulations(true);
+        setTimeout(() => setShowCongratulations(false), 5000);
+      }
+      
       alert(`Pokémon ${newPokemon.name} registrado com sucesso!`);
       setActiveTab('list');
     } catch (apiError) {
@@ -301,6 +310,20 @@ const PokemonTrainer = () => {
                             <img 
                                 src={escudoInternacional} 
                                 alt="Escudo Internacional" 
+                                style={{
+                                    position: 'absolute',
+                                    bottom: '0',
+                                    right: '0',
+                                    width: '40px',
+                                    height: '40px',
+                                    objectFit: 'contain'
+                                }}
+                            />
+                        )}
+                        {pokemonName.toLowerCase().includes('muriel') && (
+                            <img 
+                                src={brasaoMuriel} 
+                                alt="Brasão Muriel" 
                                 style={{
                                     position: 'absolute',
                                     bottom: '0',
@@ -402,6 +425,20 @@ const PokemonTrainer = () => {
                           }}
                         />
                       )}
+                      {p.name.toLowerCase().includes('muriel') && (
+                        <img 
+                          src={brasaoMuriel} 
+                          alt="Brasão Muriel" 
+                          style={{
+                            position: 'absolute',
+                            bottom: '0',
+                            right: '0',
+                            width: '24px',
+                            height: '24px',
+                            objectFit: 'contain'
+                          }}
+                        />
+                      )}
                     </div>
                   ) : (
                     <span>-</span>
@@ -421,6 +458,27 @@ const PokemonTrainer = () => {
   return (
     <>
       <Header user={currentUser} />
+      {showCongratulations && (
+        <div style={{
+          position: 'fixed',
+          top: '0',
+          left: '0',
+          width: '100%',
+          height: '100%',
+          zIndex: 9999,
+          animation: 'fadeInOut 5s ease-in-out',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          background: 'rgba(0, 0, 0, 0.5)'
+        }}>
+          <img 
+            src={gifCongratulations} 
+            alt="Congratulations" 
+            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+          />
+        </div>
+      )}
       <div className="container">
         <div className="main-content">
           <div className="tabs">

@@ -236,3 +236,19 @@
 .progress-em-analise { background-color: #ffb300; } /* Amarelo */
 .progress-em-tratamento { background-color: #4a90e2; } /* Azul principal */
 .progress-curado { background-color: #66bb6a; } /* Verde */
+
+/* Animação para Congratulations GIF */
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
