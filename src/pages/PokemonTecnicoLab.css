@@ -141,14 +141,24 @@
   margin: 0.5rem 0;
   font-size: 0.85rem;
   font-weight: 600;
-  color: #f0ad4e;
+  color: #333;
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  display: inline-block;
+}
+
+.exam-card .exam-status.exam-status-pendente {
+  background-color: #ffc107;
+  color: #333;
 }
 
 .exam-card .exam-status.exam-status-concluido {
-  color: #2e8b57;
+  background-color: #28a745;
+  color: #fff;
 }
 
 .exam-card .exam-status.exam-status-outro {
+  background-color: #e9ecef;
   color: #555;
 }
 

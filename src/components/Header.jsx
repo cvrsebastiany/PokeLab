@@ -1,5 +1,6 @@
 import { logout } from '../utils/api';
 import './Header.css'
+import treinadorAvatar from '../assets/treinador.gif';
 import tecnicoAvatar from '../assets/tecnico_foto_perfil-removebg-preview.png';
 import professorAvatar from '../assets/professor_icon-removebg-preview.png';
 
@@ -11,9 +12,12 @@ function Header({ user }) {
   };
 
   const perfilId = Number(user?.perfilId || user?.perfil?.id);
+  const isTreinador = perfilId === 1;
   const isTecnico = perfilId === 3;
   const isProfessorSaude = perfilId === 2;
-  const avatarSrc = isTecnico
+  const avatarSrc = isTreinador
+    ? treinadorAvatar
+    : isTecnico
     ? tecnicoAvatar
     : isProfessorSaude
       ? professorAvatar
@@ -33,7 +37,7 @@ function Header({ user }) {
               <span className="user-profile">{user.perfil?.nome || 'Usuário'}</span>
             </div>
             <div className="user-avatar">
-              {avatarSrc ? <img src={avatarSrc} alt="Avatar" /> : '👤'}
+              {avatarSrc ? <img src={avatarSrc} alt="Avatar" className="avatar-img" /> : '👤'}
             </div>
           </div>
         )}
