@@ -1,6 +1,7 @@
 import { logout } from '../utils/api';
 import './Header.css'
 import tecnicoAvatar from '../assets/tecnico_foto_perfil-removebg-preview.png';
+import professorAvatar from '../assets/professor_icon-removebg-preview.png';
 
 function Header({ user }) {
   const handleLogout = async () => {
@@ -11,7 +12,12 @@ function Header({ user }) {
 
   const perfilId = Number(user?.perfilId || user?.perfil?.id);
   const isTecnico = perfilId === 3;
-  const avatarSrc = isTecnico ? tecnicoAvatar : user?.avatar || user?.foto || null;
+  const isProfessorSaude = perfilId === 2;
+  const avatarSrc = isTecnico
+    ? tecnicoAvatar
+    : isProfessorSaude
+      ? professorAvatar
+      : user?.avatar || user?.foto || null;
 
   return (
     <header className="header">
