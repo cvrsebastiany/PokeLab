@@ -21,6 +21,7 @@ variables:
     value: "22.x"
   - name: CI
     value: false
+  - group: FRONTEND_DOTENV_PRODUCAO
 
 stages:
   - stage: Build
@@ -36,6 +37,15 @@ stages:
             displayName: "Use Node.js $(NODE_VERSION)"
             inputs:
               versionSpec: $(NODE_VERSION)
+          - bash: |
+              pwd
+              # Create .env file with DOTENV_ prefix removed
+              printenv | grep '^DOTENV_' | while IFS='=' read -r name value; do
+                echo "${name#DOTENV_}=${value}" >> .env
+              done
+              ls -la
+              #cat .env
+            displayName: 'Create DOTENV file'      
 
           - script: npm install
             displayName: "Install dependencies"
