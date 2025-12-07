@@ -29,6 +29,8 @@ function PokemonTecnicoLab() {
   const [examesBioquimica, setExamesBioquimica] = useState([]);
   const [isLoadingExames, setIsLoadingExames] = useState(true);
   const [erroCarregamento, setErroCarregamento] = useState("");
+  const [examFormData, setExamFormData] = useState({});
+  const [isSavingExam, setIsSavingExam] = useState(false);
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -218,6 +220,153 @@ function PokemonTecnicoLab() {
     }
   };
 
+  const handleSaveExamResults = async () => {
+    if (!exameSelecionado || isSavingExam) return;
+
+    setIsSavingExam(true);
+    try {
+      // Determine the API endpoint based on exam type
+      let apiUrl = API_EXAMES_URL;
+      if (exameSelecionado.tipoExame === 'Urina') {
+        apiUrl = API_EXAMES_URINA_URL;
+      } else if (exameSelecionado.tipoExame === 'Bioquímica') {
+        apiUrl = API_EXAMES_BIOQUIMICA_URL;
+      }
+
+      // Clean form data: convert empty strings to null for numeric fields
+      const cleanedData = {};
+      Object.keys(examFormData).forEach(key => {
+        const value = examFormData[key];
+        const inputType = getInputTypeForField(key);
+        
+        if (inputType === 'number') {
+          // Convert empty strings or whitespace to null for numeric fields
+          cleanedData[key] = value === '' || value === null || value === undefined 
+            ? null 
+            : Number(value);
+        } else {
+          // Keep string values as is, but convert empty strings to null
+          cleanedData[key] = value === '' ? null : value;
+        }
+      });
+
+      // Prepare the payload with cleaned data and set status to Concluído
+      const payload = {
+        ...cleanedData,
+        status: 'Concluído',
+        dataResultado: new Date().toISOString(),
+        tecnicoId: currentUser?.id,
+      };
+
+      const response = await fetch(`${apiUrl}/${exameSelecionado.id}`, {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      if (!response.ok) {
+        throw new Error('Falha ao salvar resultados do exame');
+      }
+
+      // Update local state to reflect the changes
+      if (exameSelecionado.tipoExame === 'Hemograma') {
+        setExames(prev => prev.map(e => 
+          e.id === exameSelecionado.id ? { ...e, ...payload } : e
+        ));
+      } else if (exameSelecionado.tipoExame === 'Urina') {
+        setExamesUrina(prev => prev.map(e => 
+          e.id === exameSelecionado.id ? { ...e, ...payload } : e
+        ));
+      } else if (exameSelecionado.tipoExame === 'Bioquímica') {
+        setExamesBioquimica(prev => prev.map(e => 
+          e.id === exameSelecionado.id ? { ...e, ...payload } : e
+        ));
+      }
+
+      alert('Resultados salvos com sucesso!');
+      setExameSelecionado(null);
+      setExamFormData({});
+    } catch (error) {
+      console.error('Erro ao salvar exame:', error);
+      alert('Erro ao salvar resultados. Tente novamente.');
+    } finally {
+      setIsSavingExam(false);
+    }
+  };
+
+  const handleExamFieldChange = (campo, value) => {
+    setExamFormData(prev => ({
+      ...prev,
+      [campo]: value,
+    }));
+  };
+
+  const getInputTypeForField = (campo) => {
+    const lowerCampo = campo.toLowerCase();
+    // Numeric fields
+    if (lowerCampo.includes('ph') || 
+        lowerCampo.includes('hemoglobina') || 
+        lowerCampo.includes('leucocitos') || 
+        lowerCampo.includes('plaquetas') ||
+        lowerCampo.includes('proteinas') ||
+        lowerCampo.includes('glicose') ||
+        lowerCampo.includes('ureia') ||
+        lowerCampo.includes('creatinina') ||
+        lowerCampo.includes('colesterol') ||
+        lowerCampo.includes('triglicerideos') ||
+        lowerCampo.includes('alt') ||
+        lowerCampo.includes('ast') ||
+        lowerCampo.includes('fosfatase') ||
+        lowerCampo.includes('bilirrubina') ||
+        lowerCampo.includes('calcio') ||
+        lowerCampo.includes('fosforo') ||
+        lowerCampo.includes('magnesio') ||
+        lowerCampo.includes('sodio') ||
+        lowerCampo.includes('potassio') ||
+        lowerCampo.includes('cloro')) {
+      return 'number';
+    }
+    return 'text';
+  };
+
+  const getInputPropsForField = (campo) => {
+    const lowerCampo = campo.toLowerCase();
+    const props = { type: getInputTypeForField(campo) };
+    
+    if (props.type === 'number') {
+      props.step = '0.01';
+      props.min = '0';
+      
+      // Set max values based on field type
+      if (lowerCampo.includes('ph')) {
+        props.max = '14';
+      } else if (lowerCampo.includes('hemoglobina')) {
+        props.max = '25';
+      } else if (lowerCampo.includes('leucocitos') || lowerCampo.includes('plaquetas')) {
+        props.max = '999999';
+      } else if (lowerCampo.includes('proteinas') || lowerCampo.includes('creatinina')) {
+        props.max = '999.99';
+      } else {
+        props.max = '9999.99';
+      }
+    }
+    
+    return props;
+  };
+
+  const handleOpenExam = (exame) => {
+    setExameSelecionado(exame);
+    // Initialize form data with existing values
+    const initialData = {};
+    exame.campos.forEach(campo => {
+      initialData[campo] = exame[campo] || '';
+    });
+    setExamFormData(initialData);
+  };
+
   return (
     <div className="app">
       <Header user={currentUser} />
@@ -264,7 +413,7 @@ function PokemonTecnicoLab() {
                       className={`exam-card ${!isPendente ? "exam-card-disabled" : ""}`}
                       onClick={() => {
                         if (!isPendente) return;
-                        setExameSelecionado({ ...exame, tipo: examNome, campos: examCampos });
+                        handleOpenExam({ ...exame, tipo: examNome, campos: examCampos });
                       }}
                     >
                       <h3>{examNome}</h3>
@@ -302,31 +451,37 @@ function PokemonTecnicoLab() {
       {exameSelecionado && (
         <div className="exam-editor-overlay">
           <div className="exam-editor">
-            {(exameSelecionado.campos || []).map((campo) => (
-              <div key={campo} className="editor-group">
-                <label>{campo}</label>
-                <input 
-                  type="text" 
-                  placeholder={`Informe ${campo}`}
-                  defaultValue={exameSelecionado[campo] || ""}
-                />
-              </div>
-            ))}
+            {(exameSelecionado.campos || []).map((campo) => {
+              const inputProps = getInputPropsForField(campo);
+              return (
+                <div key={campo} className="editor-group">
+                  <label>{campo}</label>
+                  <input 
+                    {...inputProps}
+                    placeholder={`Informe ${campo}`}
+                    value={examFormData[campo] || ""}
+                    onChange={(e) => handleExamFieldChange(campo, e.target.value)}
+                  />
+                </div>
+              );
+            })}
             <div className="editor-actions">
               <button
                 className="btn-cancel"
-                onClick={() => setExameSelecionado(null)}
+                onClick={() => {
+                  setExameSelecionado(null);
+                  setExamFormData({});
+                }}
+                disabled={isSavingExam}
               >
                 Cancelar
               </button>
               <button
                 className="btn-save"
-                onClick={() => {
-                  alert("Resultados salvos");
-                  setExameSelecionado(null);
-                }}
+                onClick={handleSaveExamResults}
+                disabled={isSavingExam}
               >
-                Salvar resultados
+                {isSavingExam ? 'Salvando...' : 'Salvar resultados'}
               </button>
             </div>
           </div>
