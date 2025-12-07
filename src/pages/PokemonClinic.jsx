@@ -11,6 +11,7 @@ function PokemonClinic() {
   const [currentUser, setCurrentUser] = useState(null);
   const [allPokemons, setAllPokemons] = useState([]);
   const [isLoadingPokemons, setIsLoadingPokemons] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
     const fetchCurrentUser = async () => {
@@ -59,6 +60,10 @@ function PokemonClinic() {
   }
 };
 
+  const filteredPokemons = allPokemons.filter((pokemon) =>
+    pokemon?.name?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
 
   return (
     <div className="app">
@@ -69,13 +74,23 @@ function PokemonClinic() {
         <main className="main-content">
           <h2 className="dashboard-title">Dashboard Médico</h2>
 
+          <div className="search-container">
+            <input
+              type="text"
+              placeholder="Buscar por nome do Pokémon..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="search-input"
+            />
+          </div>
+
           {isLoadingPokemons ? (
             <p>Carregando pokémons...</p>
-          ) : allPokemons.length === 0 ? (
-            <p>Nenhum pokémon registrado.</p>
+          ) : filteredPokemons.length === 0 ? (
+            <p>{searchTerm ? 'Nenhum pokémon encontrado.' : 'Nenhum pokémon registrado.'}</p>
           ) : (
             <div className="pokemon-cards">
-              {allPokemons.map((p) => (
+              {filteredPokemons.map((p) => (
                 <div key={p.id} className="pokemon-card">
                   {p?.imageUrl && (
                     <div className="card-image">
