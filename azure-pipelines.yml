@@ -35,7 +35,6 @@ stages:
               versionSpec: $(NODE_VERSION)
           - script: npm install
             displayName: 'Install dependencies'
-            workingDirectory: frontend
           - script: npm run build
             displayName: 'Build application'
           
