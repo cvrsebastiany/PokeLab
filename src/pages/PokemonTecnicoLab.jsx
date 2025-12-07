@@ -22,19 +22,16 @@ function PokemonTecnicoLab() {
     {
       id: 1,
       tipo: "Hemograma",
-      status: "Pendente",
       campos: ["Hemoglobina", "Leucócitos", "Plaquetas"],
     },
     {
       id: 2,
       tipo: "Urina",
-      status: "Pendente",
       campos: ["Cor", "pH", "Proteínas"],
     },
     {
       id: 3,
       tipo: "Bioquímica",
-      status: "Pendente",
       campos: ["Glicose", "Ureia", "Creatinina"],
     },
   ];
@@ -128,7 +125,6 @@ function PokemonTecnicoLab() {
                       onClick={() => setExameSelecionado(exame)}
                     >
                       <h3>{exame.tipo}</h3>
-                      <span className="status">{exame.status}</span>
                       <p>Clique para preencher resultados</p>
                     </div>
                   ))}
