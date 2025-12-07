@@ -22,14 +22,6 @@ function PokemonSidebar({ pokemon }) {
             <span className="info-value">{pokemon.trainer}</span>
           </div>
           <div className="info-row">
-            <span className="info-label">Level:</span>
-            <span className="info-value">{pokemon.level}</span>
-          </div>
-          <div className="info-row">
-            <span className="info-label">HP:</span>
-            <span className="info-value">{pokemon.hp}</span>
-          </div>
-          <div className="info-row">
             <span className="info-label">Nature:</span>
             <span className="info-value">{pokemon.nature}</span>
           </div>
