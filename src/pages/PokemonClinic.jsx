@@ -1,4 +1,3 @@
-// PokemonClinic.jsx
 import { useState, useEffect } from 'react';
 import Header from '../components/Header';
 import './PokemonClinic.css';
@@ -308,7 +307,6 @@ function PokemonClinic() {
           )}
         </main>
 
-        {/* Detail Panel */}
         {selectedPokemon && (
           <div className="detail-panel-overlay" onClick={closePanel}>
             <div className="detail-panel" onClick={(e) => e.stopPropagation()}>

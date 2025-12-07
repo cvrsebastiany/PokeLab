@@ -16,8 +16,8 @@ const API_AUTH_ME_URL = `${API_BASE}/auth/me`;
 
 
 /**
- * Função REAL para buscar dados do Pokémon na PokeAPI
- * @param {string} name - Nome do Pokémon
+ * Função para buscar dados do Pokémon na PokeAPI
+ * @param {string} name
  */
 const fetchPokemonStatus = async (name) => {
   const lowerName = name.toLowerCase().trim();
@@ -35,21 +35,17 @@ const fetchPokemonStatus = async (name) => {
 
     const data = await response.json();
 
-    // Extrair os dados relevantes
     const stats = data.stats.reduce((acc, stat) => {
-      // Mapeia os nomes das stats
       if (stat.stat.name === 'hp') acc.hp = stat.base_stat;
       if (stat.stat.name === 'attack') acc.attack = stat.base_stat;
       if (stat.stat.name === 'defense') acc.defense = stat.base_stat;
       return acc;
     }, {});
     
-    // Pega o primeiro tipo do array de tipos
     const type = data.types.length > 0 
       ? data.types[0].type.name.charAt(0).toUpperCase() + data.types[0].type.name.slice(1) // Capitaliza o tipo
       : 'Unknown';
 
-    // Pega a URL da imagem Dream World do Pokémon (SVG de alta qualidade)
     const imageUrl = data.sprites?.other?.dream_world?.front_default || data.sprites?.other?.['official-artwork']?.front_default || data.sprites?.front_default || null;
 
     return { 
@@ -60,7 +56,6 @@ const fetchPokemonStatus = async (name) => {
     
   } catch (error) {
     console.error("Erro na PokeAPI:", error);
-    // Propaga o erro para ser tratado no useEffect
     throw error; 
   }
 };
@@ -80,7 +75,6 @@ const PokemonTrainer = () => {
   const [isLoadingPokemons, setIsLoadingPokemons] = useState(false);
   const [showCongratulations, setShowCongratulations] = useState(false);
 
-  // Fetch current user on component mount
   useEffect(() => {
     const fetchCurrentUser = async () => {
       setIsLoadingUser(true);
@@ -112,7 +106,6 @@ const PokemonTrainer = () => {
     fetchCurrentUser();
   }, []);
 
-  // Fetch trainer's pokémons when switching to list tab
   useEffect(() => {
     const fetchTrainerPokemons = async () => {
       if (activeTab !== 'list' || !currentUser?.id) {
@@ -129,7 +122,6 @@ const PokemonTrainer = () => {
           const pokemons = await response.json();
           console.log('Fetched trainer pokemons:', pokemons);
           
-          // Transform API data to match the component's format
           const formattedPokemons = pokemons.map(pokemon => ({
             id: pokemon.id,
             name: pokemon.name,
@@ -161,7 +153,6 @@ const PokemonTrainer = () => {
     fetchTrainerPokemons();
   }, [activeTab, currentUser]);
 
-  // Efeito para buscar o status do Pokémon (com debounce para não sobrecarregar a API)
   useEffect(() => {
     if (!species.trim()) {
       setPokemonStatus(null);
@@ -169,7 +160,6 @@ const PokemonTrainer = () => {
       return;
     }
 
-    // Limpa qualquer erro anterior ao iniciar uma nova busca
     setError('');
 
     const delayDebounceFn = setTimeout(async () => {
@@ -257,7 +247,6 @@ const PokemonTrainer = () => {
 
       const saved = await response.json().catch(() => null);
 
-      // Add the new pokemon to the list immediately
       const newPokemon = {
         id: saved?.id ?? Date.now(),
         name: pokemonName.trim().charAt(0).toUpperCase() + pokemonName.trim().slice(1).toLowerCase(), // Nome capitalizado
@@ -270,14 +259,12 @@ const PokemonTrainer = () => {
 
       setRegisteredPokemons(prev => [...prev, newPokemon]);
       
-      // Resetar formulário
       setPokemonName('');
       setSpecies('');
       setPokemonStatus(null);
       setError('');
       setHasAttemptedSubmit(false);
       
-      // Mostrar gif de congratulations se for Muriel
       if (newPokemon.name.toLowerCase().includes('muriel')) {
         setShowCongratulations(true);
         setTimeout(() => setShowCongratulations(false), 5000);
@@ -336,7 +323,6 @@ const PokemonTrainer = () => {
                         )}
                     </div>
                 )}
-                {/* O tipo agora virá da API e terá a primeira letra maiúscula */}
                 <p><strong>Tipo:</strong> <span className={`type-tag type-${pokemonStatus.type.toLowerCase()}`}>{pokemonStatus.type}</span></p>
                 <p><strong>HP (Vida):</strong> {pokemonStatus.hp}</p>
                 <p><strong>Ataque:</strong> {pokemonStatus.attack}</p>

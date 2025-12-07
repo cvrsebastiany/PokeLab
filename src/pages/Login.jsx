@@ -143,7 +143,6 @@ function Login() {
           </div>
         </form>
       </div>
-    {/* Pikachu GIF animado na parte inferior */}
     <img
       src={pikachuGif}
       alt="Pikachu correndo"

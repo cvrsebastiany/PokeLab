@@ -1,10 +1,8 @@
-/* --- Base CSS (Fornecido) --- */
 .container {
     display: flex;
     gap: 1.5rem;
     padding: 1.5rem;
     width: 100%;
-    /* Ajustado para preencher a tela, considerando o cabeçalho (se houver) */
     height: calc(100vh - 64px);
     background: #e8f0e8;
 }
@@ -41,7 +39,7 @@
 }
 
 .tab.active {
-    color: #4a90e2; /* Azul para aba ativa */
+    color: #4a90e2;
 }
 
 .tab.active::after {
@@ -54,14 +52,12 @@
     background: #4a90e2;
 }
 
-/* Removido .clinical-analysis pois não é usado nesta tela */
-
 .tab-content {
     padding: 2rem;
 }
 
 .tab-content h3 {
-    font-size: 1.25rem; /* Aumentei um pouco para destaque */
+    font-size: 1.25rem;
     font-weight: 600;
     color: #333;
     margin-bottom: 1.5rem;
@@ -78,8 +74,6 @@
         flex-direction: column;
     }
 }
-
-/* --- Estilos da Aba de Cadastro --- */
 
 .register-form {
     display: flex;
@@ -104,7 +98,7 @@
     border: 1px solid #ccc;
     border-radius: 6px;
     font-size: 1rem;
-    box-sizing: border-box; /* Garante que padding não estoure o width */
+    box-sizing: border-box;
 }
 
 .form-group textarea {
@@ -129,15 +123,13 @@
 }
 
 .error-message {
-    color: #D32F2F; /* Vermelho */
+    color: #D32F2F;
     background-color: #FFEBEE;
     border: 1px solid #D32F2F;
     padding: 0.75rem;
     border-radius: 4px;
     font-weight: 500;
 }
-
-/* --- Estilos do Cartão de Status --- */
 
 .status-card {
     background: #f9f9f9;
@@ -160,8 +152,6 @@
     margin: 0.5rem 0;
     font-size: 0.95rem;
 }
-
-/* --- Estilos da Aba de Lista --- */
 
 .pokemon-list table {
     width: 100%;
@@ -197,8 +187,6 @@
     border-radius: 8px;
 }
 
-/* --- Estilos de Tags de Tipo e Progresso --- */
-
 .type-tag,
 .progress-tag {
     display: inline-block;
@@ -210,7 +198,6 @@
     text-transform: uppercase;
 }
 
-/* Cores de Tipo (Exemplos) */
 .type-electric { background-color: #f7d02c; color: #333; }
 .type-fire { background-color: #ee8130; }
 .type-grass { background-color: #7ac74c; }
@@ -231,13 +218,11 @@
 .type-dark { background-color: #705746; }
 .type-unknown { background-color: #68A090; }
 
-/* Cores de Progresso (Exemplos) */
-.progress-aguardando-triagem { background-color: #90a4ae; } /* Azul acinzentado */
-.progress-em-analise { background-color: #ffb300; } /* Amarelo */
-.progress-em-tratamento { background-color: #4a90e2; } /* Azul principal */
-.progress-curado { background-color: #66bb6a; } /* Verde */
+.progress-aguardando-triagem { background-color: #90a4ae; }
+.progress-em-analise { background-color: #ffb300; }
+.progress-em-tratamento { background-color: #4a90e2; }
+.progress-curado { background-color: #66bb6a; }
 
-/* Animação para Congratulations GIF */
 @keyframes fadeInOut {
   0% {
     opacity: 0;

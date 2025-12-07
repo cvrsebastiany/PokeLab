@@ -128,7 +128,6 @@ function PokemonTecnicoLab() {
   }, [exames, examesUrina, examesBioquimica]);
 
   useEffect(() => {
-    // Filter pokémons to show only those with pending exams
     const filtered = pokemonsRaw.filter((pokemon) => {
       const pokemonId = pokemon.id?.toString();
       return pokemonId && pokemonIdsWithPendingExams.has(pokemonId);
@@ -225,7 +224,6 @@ function PokemonTecnicoLab() {
 
     setIsSavingExam(true);
     try {
-      // Determine the API endpoint based on exam type
       let apiUrl = API_EXAMES_URL;
       if (exameSelecionado.tipoExame === 'Urina') {
         apiUrl = API_EXAMES_URINA_URL;
@@ -233,24 +231,20 @@ function PokemonTecnicoLab() {
         apiUrl = API_EXAMES_BIOQUIMICA_URL;
       }
 
-      // Clean form data: convert empty strings to null for numeric fields
       const cleanedData = {};
       Object.keys(examFormData).forEach(key => {
         const value = examFormData[key];
         const inputType = getInputTypeForField(key);
         
         if (inputType === 'number') {
-          // Convert empty strings or whitespace to null for numeric fields
           cleanedData[key] = value === '' || value === null || value === undefined 
             ? null 
             : Number(value);
         } else {
-          // Keep string values as is, but convert empty strings to null
           cleanedData[key] = value === '' ? null : value;
         }
       });
 
-      // Prepare the payload with cleaned data and set status to Concluído
       const payload = {
         ...cleanedData,
         status: 'Concluído',
@@ -271,7 +265,6 @@ function PokemonTecnicoLab() {
         throw new Error('Falha ao salvar resultados do exame');
       }
 
-      // Update local state to reflect the changes
       if (exameSelecionado.tipoExame === 'Hemograma') {
         setExames(prev => prev.map(e => 
           e.id === exameSelecionado.id ? { ...e, ...payload } : e
@@ -306,7 +299,6 @@ function PokemonTecnicoLab() {
 
   const getInputTypeForField = (campo) => {
     const lowerCampo = campo.toLowerCase();
-    // Numeric fields
     if (lowerCampo.includes('ph') || 
         lowerCampo.includes('hemoglobina') || 
         lowerCampo.includes('leucocitos') || 
@@ -340,7 +332,6 @@ function PokemonTecnicoLab() {
       props.step = '0.01';
       props.min = '0';
       
-      // Set max values based on field type
       if (lowerCampo.includes('ph')) {
         props.max = '14';
       } else if (lowerCampo.includes('hemoglobina')) {
@@ -359,7 +350,6 @@ function PokemonTecnicoLab() {
 
   const handleOpenExam = (exame) => {
     setExameSelecionado(exame);
-    // Initialize form data with existing values
     const initialData = {};
     exame.campos.forEach(campo => {
       initialData[campo] = exame[campo] || '';
@@ -408,7 +398,6 @@ function PokemonTecnicoLab() {
                   const examNome = exame.tipoExame || exame.tipo || exame.nome || exame.name || `Exame #${examId}`;
                   const dataConclusao = exame.dataResultado || exame.dataresultado || exame.data_conclusao;
                   const statusClass = isConcluido ? "concluido" : isPendente ? "pendente" : "outro";
-                  // Extract field names from the exam object (exclude metadata)
                   const metadataKeys = new Set(['id', 'pokemon', 'pokemonId', 'tecnico', 'tecnicoId', 'status', 'observacoes', 'dataColeta', 'dataResultado', 'createdAt', 'updatedAt', 'tipoExame']);
                   const examCampos = Object.keys(exame).filter(key => !metadataKeys.has(key));
                   return (

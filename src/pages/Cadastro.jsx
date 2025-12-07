@@ -17,7 +17,6 @@ function Cadastro() {
   const [error, setError] = useState("");
   const navegar = useNavigate();
 
-  // Formata telefone no padrão (99) 99999-9999
   function formatoTelefone(value) {
     const numbers = value.replace(/\D/g, "");
     if (numbers.length > 11) return telefone;
@@ -26,7 +25,6 @@ function Cadastro() {
     return `(${numbers.slice(0, 2)}) ${numbers.slice(2, 7)}-${numbers.slice(7)}`;
   }
 
-  // Valida campos do formulário
   function formatoValido() {
     const telefoneValido = /^\(\d{2}\) \d{5}-\d{4}$/.test(telefone);
     return (
@@ -45,7 +43,6 @@ function Cadastro() {
     setError("");
 
     try {
-      // Converte perfil em perfilId
       const perfilMap = {
         treinador: 1,
         profissionalSaude: 2,
