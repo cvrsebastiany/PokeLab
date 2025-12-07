@@ -61,6 +61,26 @@
   box-shadow: 0 0 0 2px rgba(74, 144, 226, 0.15);
 }
 
+.select-wrapper {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.select-wrapper select {
+  flex: 1;
+  min-width: 0;
+}
+
+.perfil-gif {
+  width: min(420px, 40%);
+  height: auto;
+  max-height: 420px;
+  object-fit: contain;
+  display: block;
+}
+
 
 .cadastro-button {
   width: 100%;

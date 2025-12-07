@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FiEye, FiEyeOff } from "react-icons/fi";
+import oshawottGif from "../assets/oshawott.gif";
 import "./Cadastro.css";
 
 const API_URL = import.meta.env.VITE_API_URL;
@@ -191,6 +192,11 @@ function Cadastro() {
                 <option value="profissionalSaude">Profissional da Saúde</option>
                 <option value="tecnicoLaboratorio">Técnico de Laboratório</option>
               </select>
+              <img
+                src={oshawottGif}
+                alt="Oshawott animado"
+                className="perfil-gif"
+              />
             </div>
           </div>
 
