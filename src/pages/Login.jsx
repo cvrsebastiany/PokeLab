@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import "./Login.css";
+import "./PikachuGif.css";
+import pikachuGif from "../assets/pikachu-running.gif";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -136,6 +138,13 @@ function Login() {
           </div>
         </form>
       </div>
+    {/* Pikachu GIF animado na parte inferior */}
+    <img
+      src={pikachuGif}
+      alt="Pikachu correndo"
+      className="pikachu-gif"
+      draggable={false}
+    />
     </div>
   );
 }
