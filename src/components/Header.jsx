@@ -1,5 +1,6 @@
 import { logout } from '../utils/api';
 import './Header.css'
+import tecnicoAvatar from '../assets/tecnico_foto_perfil-removebg-preview.png';
 
 function Header({ user }) {
   const handleLogout = async () => {
@@ -7,6 +8,10 @@ function Header({ user }) {
       await logout();
     }
   };
+
+  const perfilId = Number(user?.perfilId || user?.perfil?.id);
+  const isTecnico = perfilId === 3;
+  const avatarSrc = isTecnico ? tecnicoAvatar : user?.avatar || user?.foto || null;
 
   return (
     <header className="header">
@@ -21,7 +26,9 @@ function Header({ user }) {
               <span className="user-name">{user.nome}</span>
               <span className="user-profile">{user.perfil?.nome || 'Usuário'}</span>
             </div>
-            <div className="user-avatar">👤</div>
+            <div className="user-avatar">
+              {avatarSrc ? <img src={avatarSrc} alt="Avatar" /> : '👤'}
+            </div>
           </div>
         )}
         {!user && <div className="user-avatar">👤</div>}
