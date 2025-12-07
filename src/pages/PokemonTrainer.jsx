@@ -7,8 +7,9 @@ const dummyPokemons = [
   
 ];
 
-const API_BASE = 'https://saudedigital.ufcspa.edu.br/pokelab-api';
+const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:3004/pokelab-api';
 const API_POKEMON_URL = `${API_BASE}/pokemon`;
+const API_AUTH_ME_URL = `${API_BASE}/auth/me`;
 
 
 /**
@@ -66,6 +67,41 @@ const PokemonTrainer = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState('');
+  const [currentUser, setCurrentUser] = useState(null);
+  const [isLoadingUser, setIsLoadingUser] = useState(true);
+  const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
+
+  // Fetch current user on component mount
+  useEffect(() => {
+    const fetchCurrentUser = async () => {
+      setIsLoadingUser(true);
+      try {
+        console.log('Fetching current user from:', API_AUTH_ME_URL);
+        const response = await fetch(API_AUTH_ME_URL, {
+          credentials: 'include',
+        });
+        
+        console.log('Auth response status:', response.status);
+        
+        if (response.ok) {
+          const userData = await response.json();
+          console.log('User data received:', userData);
+          setCurrentUser(userData);
+        } else {
+          console.warn('User not authenticated, login required');
+          setCurrentUser(null);
+        }
+      } catch (error) {
+        console.error('Error fetching current user:', error);
+        setCurrentUser(null);
+      } finally {
+        setIsLoadingUser(false);
+        console.log('Finished loading user');
+      }
+    };
+
+    fetchCurrentUser();
+  }, []);
 
   // Efeito para buscar o status do Pokémon (com debounce para não sobrecarregar a API)
   useEffect(() => {
@@ -97,6 +133,7 @@ const PokemonTrainer = () => {
 
   const handleRegister = async (e) => {
     e.preventDefault();
+    setHasAttemptedSubmit(true);
     
     if (!pokemonName.trim() || !species.trim()) {
       setError('Por favor, preencha o nome do seu Pokémon e a espécie.');
@@ -115,11 +152,25 @@ const PokemonTrainer = () => {
         return;
     }
 
+    if (isLoadingUser) {
+        console.log('Still loading user, showing loading message');
+        setError('Carregando informações do usuário. Aguarde...');
+        return;
+    }
+
+    console.log('Current user state:', currentUser);
+    
+    if (!currentUser || !currentUser.id) {
+        console.log('User not authenticated');
+        setError('Usuário não autenticado. Por favor, faça login novamente.');
+        return;
+    }
+
     setError('');
     setIsSaving(true);
 
     try {
-      const trainerId = 1;
+      const trainerId = currentUser.id;
 
       const payload = {
         name: pokemonName.trim(),
@@ -222,8 +273,8 @@ const PokemonTrainer = () => {
 
       {error && <p className="error-message">⚠️ {error}</p>}
       
-      <button type="submit" className="register-button" disabled={isLoading || isSaving || !pokemonStatus}>
-        {isSaving ? 'Salvando...' : isLoading ? 'Aguarde a busca...' : 'Cadastrar Pokémon'}
+      <button type="submit" className="register-button" disabled={isLoading || isSaving || !pokemonStatus || isLoadingUser}>
+        {isSaving ? 'Salvando...' : isLoading ? 'Aguarde a busca...' : isLoadingUser ? 'Carregando...' : 'Cadastrar Pokémon'}
       </button>
     </form>
   );
