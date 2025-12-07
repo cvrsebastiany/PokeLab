@@ -70,6 +70,7 @@ const PokemonTrainer = () => {
   const [currentUser, setCurrentUser] = useState(null);
   const [isLoadingUser, setIsLoadingUser] = useState(true);
   const [hasAttemptedSubmit, setHasAttemptedSubmit] = useState(false);
+  const [isLoadingPokemons, setIsLoadingPokemons] = useState(false);
 
   // Fetch current user on component mount
   useEffect(() => {
@@ -102,6 +103,54 @@ const PokemonTrainer = () => {
 
     fetchCurrentUser();
   }, []);
+
+  // Fetch trainer's pokémons when switching to list tab
+  useEffect(() => {
+    const fetchTrainerPokemons = async () => {
+      if (activeTab !== 'list' || !currentUser?.id) {
+        return;
+      }
+
+      setIsLoadingPokemons(true);
+      try {
+        const response = await fetch(`${API_POKEMON_URL}?trainerId=${currentUser.id}`, {
+          credentials: 'include',
+        });
+
+        if (response.ok) {
+          const pokemons = await response.json();
+          console.log('Fetched trainer pokemons:', pokemons);
+          
+          // Transform API data to match the component's format
+          const formattedPokemons = pokemons.map(pokemon => ({
+            id: pokemon.id,
+            name: pokemon.name,
+            species: pokemon.species,
+            status: {
+              type: pokemon.type,
+              hp: pokemon.hp,
+              attack: pokemon.attack,
+              defense: pokemon.defense,
+            },
+            progress: 'Aguardando triagem',
+            diagnosis: 'Aguardando',
+          }));
+          
+          setRegisteredPokemons(formattedPokemons);
+        } else {
+          console.error('Failed to fetch pokemons:', response.status);
+          setRegisteredPokemons([]);
+        }
+      } catch (error) {
+        console.error('Error fetching trainer pokemons:', error);
+        setRegisteredPokemons([]);
+      } finally {
+        setIsLoadingPokemons(false);
+      }
+    };
+
+    fetchTrainerPokemons();
+  }, [activeTab, currentUser]);
 
   // Efeito para buscar o status do Pokémon (com debounce para não sobrecarregar a API)
   useEffect(() => {
@@ -198,6 +247,7 @@ const PokemonTrainer = () => {
 
       const saved = await response.json().catch(() => null);
 
+      // Add the new pokemon to the list immediately
       const newPokemon = {
         id: saved?.id ?? Date.now(),
         name: pokemonName.trim().charAt(0).toUpperCase() + pokemonName.trim().slice(1).toLowerCase(), // Nome capitalizado
@@ -214,6 +264,7 @@ const PokemonTrainer = () => {
       setSpecies('');
       setPokemonStatus(null);
       setError('');
+      setHasAttemptedSubmit(false);
       
       alert(`Pokémon ${newPokemon.name} registrado com sucesso!`);
       setActiveTab('list');
@@ -281,7 +332,9 @@ const PokemonTrainer = () => {
 
   const renderListTab = () => (
     <div className="pokemon-list">
-      {registeredPokemons.length === 0 ? (
+      {isLoadingPokemons ? (
+        <p className="loading-message">Carregando pokémons...</p>
+      ) : registeredPokemons.length === 0 ? (
         <p className="no-pokemons">Nenhum Pokémon cadastrado ainda. Use a aba "Cadastrar" para começar.</p>
       ) : (
         <table>
