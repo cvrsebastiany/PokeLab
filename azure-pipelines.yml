@@ -37,6 +37,12 @@ stages:
           - script: npm install
             displayName: "Install dependencies"
 
+          - script: |
+              git config user.name "Pipeline service user"
+              git config user.email "pipeline.service@ufcspa.edu.br"
+            displayName: "Configure git"
+            condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest')) # Run only on CI push, not PR
+
           - script: npm version patch -m "Version bump %s ***NO_CI***"
             displayName: "Bump version"
             condition: and(succeeded(), ne(variables['Build.Reason'], 'PullRequest')) # Run only on CI push, not PR
