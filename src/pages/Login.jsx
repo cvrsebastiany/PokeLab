@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import "./Login.css";
 import "./PikachuGif.css";
 import pikachuGif from "../assets/pikachu-running.gif";
+import rioluGif from "../assets/riolu-pokemon.gif";
+import scorbunnyGif from "../assets/scorbunny-pokemon.gif";
 
 const API_URL = import.meta.env.VITE_API_URL;
 
@@ -13,7 +15,16 @@ function Login() {
   const [mostrarSenha, setMostrarSenha] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [pokemonAtual, setPokemonAtual] = useState(0);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const intervalo = setInterval(() => {
+      setPokemonAtual((prev) => (prev + 1) % 3);
+    }, 7000);
+
+    return () => clearInterval(intervalo);
+  }, []);
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -144,9 +155,22 @@ function Login() {
         </form>
       </div>
     <img
-      src={pikachuGif}
-      alt="Pikachu correndo"
-      className="pikachu-gif"
+      key={pokemonAtual}
+      src={
+        pokemonAtual === 0
+          ? pikachuGif
+          : pokemonAtual === 1
+          ? rioluGif
+          : scorbunnyGif
+      }
+      alt="Pokemon correndo"
+      className={
+        pokemonAtual === 0 || pokemonAtual === 1
+          ? pokemonAtual === 1
+            ? "pokemon-gif riolu-gif"
+            : "pokemon-gif"
+          : "pokemon-gif scorbunny-gif"
+      }
       draggable={false}
     />
     </div>

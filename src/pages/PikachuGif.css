@@ -1,32 +1,75 @@
-.pikachu-gif {
+.pokemon-gif {
   position: fixed;
   left: 0;
   bottom: 0;
   z-index: 100;
   width: 100px;
   height: auto;
-  animation: pikachu-run 7s linear infinite;
+  animation: pokemon-run 7s linear forwards;
 }
 
-@keyframes pikachu-run {
+@keyframes pokemon-run {
   0% {
     left: 0;
     opacity: 1;
   }
-  95% {
+  90% {
     left: calc(100vw - 100px);
     opacity: 1;
   }
-  97% {
+  92% {
+    opacity: 0;
+  }
+  100% {
     left: calc(100vw - 100px);
     opacity: 0;
   }
-  97.1% {
-    left: 0;
-    opacity: 0;
-  }
-  98% {
+}
+
+.pokemon-gif.riolu-gif {
+  width: 150px;
+  bottom: -40px;
+  animation: riolu-run 7s linear forwards;
+}
+
+@keyframes riolu-run {
+  0% {
     left: 0;
     opacity: 1;
+  }
+  90% {
+    left: calc(100vw - 120px);
+    opacity: 1;
+  }
+  92% {
+    opacity: 0;
+  }
+  100% {
+    left: calc(100vw - 120px);
+    opacity: 0;
+  }
+}
+
+.pokemon-gif.scorbunny-gif {
+  left: auto;
+  right: 0;
+  animation: scorbunny-run 7s linear forwards;
+}
+
+@keyframes scorbunny-run {
+  0% {
+    right: 0;
+    opacity: 1;
+  }
+  90% {
+    right: calc(100vw - 100px);
+    opacity: 1;
+  }
+  92% {
+    opacity: 0;
+  }
+  100% {
+    right: calc(100vw - 100px);
+    opacity: 0;
   }
 }
